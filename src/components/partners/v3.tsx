@@ -36,6 +36,9 @@ export default function PartnersV3({ id, content }: VariantProps<"partners">) {
         <h2 className="mt-5 max-w-[20ch] text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
           {content.heading}
         </h2>
+        <p className="mt-6 max-w-[56ch] text-[clamp(0.9rem,1.1vw,1.05rem)] leading-[1.5] tracking-[-0.01em] text-foreground/75">
+          {content.body}
+        </p>
 
         <div
           className={`mt-[9vh] grid grid-cols-2 border-t border-l border-foreground/10 transition-opacity duration-700 ease-out lg:grid-cols-5 ${

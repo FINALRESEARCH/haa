@@ -70,9 +70,14 @@ export default function PartnersV1({ id, content }: VariantProps<"partners">) {
         >
           <Row direction="left" logos={content.logos} />
 
-          <h2 className="px-6 text-center text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
-            {content.heading}
-          </h2>
+          <div>
+            <h2 className="px-6 text-center text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
+              {content.heading}
+            </h2>
+            <p className="mx-auto mt-5 max-w-[56ch] px-6 text-center text-[clamp(0.9rem,1.1vw,1.05rem)] leading-[1.5] tracking-[-0.01em] text-foreground/75">
+              {content.body}
+            </p>
+          </div>
 
           <Row direction="right" logos={content.logos} />
         </div>

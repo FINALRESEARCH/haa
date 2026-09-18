@@ -32,8 +32,9 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
     network{ heading, body, cta, portraits[]->${PERSON} },
     program{ heading, subheading, paragraphs, cta },
     admissions{ image, heading, paragraphs, cta },
-    peopleWall{ heading, tiles[]->${PERSON} },
-    partners{ layout, eyebrow, heading, logos[]->{ name, logo, scale } },
-    life{ layout, image, heading, paragraphs, cta }
+    peopleWall{ layout, heading, paragraphs, tiles[]->${PERSON} },
+    partners{ layout, eyebrow, heading, body, logos[]->{ name, logo, scale } },
+    life{ layout, image, heading, paragraphs, cta },
+    closing{ layout, heading, paragraphs, applyLabel, links }
   }
 }`);

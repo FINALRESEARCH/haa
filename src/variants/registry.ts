@@ -1,4 +1,5 @@
 import { variants as admissions } from "@/components/admissions";
+import { variants as closing } from "@/components/closing";
 import { variants as hero } from "@/components/hero";
 import { variants as life } from "@/components/life";
 import { variants as network } from "@/components/network";
@@ -42,4 +43,10 @@ export const SECTIONS: SectionDef[] = [
     variants: partners,
   }),
   defineSection({ key: "life", label: "Life", anchorId: "life", variants: life }),
+  defineSection({
+    key: "closing",
+    label: "Closing",
+    anchorId: "closing",
+    variants: closing,
+  }),
 ];

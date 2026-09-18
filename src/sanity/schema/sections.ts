@@ -111,12 +111,30 @@ export const peopleWallSection = defineType({
   type: "object",
   fields: [
     defineField({
+      name: "layout",
+      type: "string",
+      description:
+        "Which of the two people layouts the page ships with. The ?people= switcher still overrides this locally.",
+      options: {
+        list: [
+          { title: "Wall (pinned, heading inverted over the tiles)", value: "wall" },
+          { title: "Stacked (heading and copy above the grid)", value: "stacked" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "wall",
+    }),
+    defineField({
       name: "heading",
       type: "text",
       rows: 2,
       description: "Sits over the wall in mix-blend-difference white.",
       validation: (rule) => rule.required(),
     }),
+    paragraphs(
+      "paragraphs",
+      'One entry per paragraph. Only the "Stacked" layout has room for these.',
+    ),
     defineField({
       name: "tiles",
       type: "array",
@@ -125,6 +143,52 @@ export const peopleWallSection = defineType({
     }),
   ],
   preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: "People wall", subtitle: title }) },
+});
+
+export const closingSection = defineType({
+  name: "closingSection",
+  title: "Closing",
+  type: "object",
+  fields: [
+    defineField({
+      name: "layout",
+      type: "string",
+      description:
+        "Which of the two closing layouts the page ships with. The ?closing= switcher still overrides this locally.",
+      options: {
+        list: [
+          { title: "Quiet (type only)", value: "quiet" },
+          { title: "Mark (the HAA drawing behind the type)", value: "mark" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "quiet",
+    }),
+    defineField({
+      name: "heading",
+      type: "text",
+      rows: 2,
+      validation: (rule) => rule.required(),
+    }),
+    paragraphs(),
+    defineField({
+      name: "applyLabel",
+      type: "string",
+      title: "Apply button label",
+      description:
+        "The button's destination is the apply link in Site settings, so the form URL is only ever set in one place.",
+      initialValue: "Apply to HAA",
+    }),
+    defineField({
+      name: "links",
+      type: "array",
+      title: "Secondary links",
+      description: "The three destinations under the button, in order.",
+      of: [defineArrayMember({ type: "cta" })],
+      validation: (rule) => rule.max(4),
+    }),
+  ],
+  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: "Closing", subtitle: title }) },
 });
 
 export const lifeSection = defineType({
@@ -140,7 +204,6 @@ export const lifeSection = defineType({
       options: {
         list: [
           { title: "Lock-up (plate rises, heading inverts)", value: "lockup" },
-          { title: "Ruled split", value: "split" },
           { title: "Full-bleed plate", value: "bleed" },
         ],
         layout: "radio",
@@ -205,6 +268,12 @@ export const partnersSection = defineType({
       type: "text",
       rows: 2,
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "body",
+      type: "text",
+      rows: 3,
+      description: "The single line under the heading.",
     }),
     defineField({
       name: "logos",

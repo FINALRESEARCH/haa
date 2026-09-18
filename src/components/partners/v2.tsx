@@ -32,9 +32,14 @@ export default function PartnersV2({ id, content }: VariantProps<"partners">) {
       id={id}
       className="flex flex-col items-center gap-[10vh] bg-background py-[18vh]"
     >
-      <h2 className="w-[min(1000px,92vw)] px-6 text-center text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
-        Connected to the institutions shaping what comes next.
-      </h2>
+      <div className="w-[min(1000px,92vw)]">
+        <h2 className="px-6 text-center text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
+          {content.heading}
+        </h2>
+        <p className="mx-auto mt-5 max-w-[56ch] px-6 text-center text-[clamp(0.9rem,1.1vw,1.05rem)] leading-[1.5] tracking-[-0.01em] text-foreground/75">
+          {content.body}
+        </p>
+      </div>
 
       <div
         className={`grid w-full grid-cols-2 gap-px border-y border-foreground/10 bg-foreground/10 transition-opacity duration-700 ease-out lg:grid-cols-5 ${

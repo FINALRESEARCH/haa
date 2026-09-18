@@ -51,7 +51,11 @@ export type AdmissionsContent = {
 };
 
 export type PeopleContent = {
+  /** Matches a `Variant["id"]` in `src/components/people/index.ts`. */
+  layout: string;
   heading: string;
+  /** Only the layouts that put the wall in normal flow have room for these. */
+  paragraphs: string[];
   tiles: Portrait[];
 };
 
@@ -70,7 +74,26 @@ export type PartnersContent = {
   layout: string;
   eyebrow: string;
   heading: string;
+  /** The single line under the heading. */
+  body: string;
   logos: PartnerLogo[];
+};
+
+export type ClosingContent = {
+  /** Matches a `Variant["id"]` in `src/components/closing/index.ts`. */
+  layout: string;
+  heading: string;
+  paragraphs: string[];
+  /**
+   * The primary button. Composed in `src/sanity/content.ts` from this
+   * section's label and `settings.applyCta.href`, so the application URL is
+   * only ever set in one place — the same trick the hero uses for `markPath`.
+   */
+  apply: Cta;
+  /** The three secondary destinations, in order. */
+  links: Cta[];
+  /** Copied from `SiteSettings`: the "Mark" layout draws it oversized. */
+  markPath: string;
 };
 
 /** Keyed by `SectionDef["key"]`, which is also the `?hero=2` URL param. */
@@ -82,6 +105,7 @@ export type SectionContent = {
   people: PeopleContent;
   partners: PartnersContent;
   life: LifeContent;
+  closing: ClosingContent;
 };
 
 export type SectionKey = keyof SectionContent;

@@ -73,13 +73,19 @@ export const DEFAULT_CONTENT: SiteContent = {
       paragraphs: [
         "Maybe you were the person building something after school while everyone else was studying for the test.",
         "Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
-        "You are curious. You take initiative. You want your work to matter. And you want to spend the next two years around people who have the same intensity.",
+        "You are curious. You take initiative. You want your work to matter.",
+        "And you want to spend the next two years around people who have the same intensity.",
       ],
       cta: { label: "Learn about admissions", href: "#admissions" },
     },
 
     people: {
+      layout: "wall",
       heading: "Meet the kind of people we’re looking for.",
+      paragraphs: [
+        "They’re already building, researching, experimenting, and pursuing ideas of their own.",
+        "Meet some of HAA’s early applicants and see what they’re working on.",
+      ],
       // The wall is four across by two down, so it takes the first eight.
       tiles: people.slice(0, 8),
     },
@@ -90,7 +96,7 @@ export const DEFAULT_CONTENT: SiteContent = {
         src: "/life/sf.jpg",
         alt: "San Francisco and the Bay Bridge at dusk, seen from across the bay",
       },
-      heading: "Two years in San Francisco.",
+      heading: "Residential in San Francisco.",
       paragraphs: [
         "HAA is residential because the people around you matter as much as the material you study.",
         "You will live and work alongside a small cohort of unusually driven peers, in a city where some of the most consequential technology companies and research labs in the world are being built.",
@@ -99,10 +105,27 @@ export const DEFAULT_CONTENT: SiteContent = {
       cta: { label: "Explore life at HAA", href: "/life" },
     },
 
+    closing: {
+      layout: "quiet",
+      heading: "What will you pursue?",
+      paragraphs: [
+        "Bring your obsessions, your unfinished ideas, the questions you can’t leave alone, and the things you have already started.",
+        "We’ll give you exceptional peers, extraordinary teachers, access to a remarkable network, and room to pursue them seriously.",
+      ],
+      apply: { label: "Apply to HAA", href: "#apply" },
+      links: [
+        { label: "Explore the Program", href: "/program" },
+        { label: "Meet the Network", href: "/network" },
+        { label: "Admissions", href: "/admissions" },
+      ],
+      markPath: MARK_PATH,
+    },
+
     partners: {
       layout: "marquee",
       eyebrow: "Partners",
       heading: "Connected to the institutions shaping what comes next.",
+      body: "HAA is being built with a network spanning frontier technology, entrepreneurship, research, and industry.",
       logos: PARTNER_LOGOS,
     },
   },

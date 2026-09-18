@@ -18,6 +18,7 @@ export const homePage = defineType({
     defineField({ name: "peopleWall", type: "peopleWallSection" }),
     defineField({ name: "partners", type: "partnersSection" }),
     defineField({ name: "life", type: "lifeSection" }),
+    defineField({ name: "closing", type: "closingSection" }),
   ],
   preview: { prepare: () => ({ title: "Home page" }) },
 });

@@ -44,6 +44,17 @@ async function uploadImage(publicPath) {
   return { _type: "image", asset: { _type: "reference", _ref: asset._id } };
 }
 
+/** Same as `uploadImage`, but a file that is not in `public` is skipped. */
+async function uploadImageIfPresent(publicPath) {
+  try {
+    return await uploadImage(publicPath);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    process.stdout.write(`  skipped ${publicPath} (not in public/)\n`);
+    return null;
+  }
+}
+
 const ref = (_ref) => ({ _type: "reference", _ref });
 
 /**
@@ -75,16 +86,18 @@ const PEOPLE = [
 ];
 
 const PARTNERS = [
-  { slug: "coinbase", name: "Coinbase", scale: 2.1 },
-  { slug: "google", name: "Google", scale: 1 },
-  { slug: "meta", name: "Meta", scale: 1 },
   { slug: "nvidia", name: "NVIDIA", scale: 1 },
+  // TODO: public/partners/a16z.svg is not in the repo yet. Until it lands the
+  // loop below skips this entry rather than failing the whole seed.
+  { slug: "a16z", name: "Andreessen Horowitz", scale: 1 },
+  { slug: "anduril", name: "Anduril", scale: 0.85 },
+  { slug: "anthropic", name: "Anthropic", scale: 1 },
+  { slug: "openai", name: "OpenAI", scale: 1 },
+  { slug: "meta", name: "Meta", scale: 1 },
+  { slug: "coinbase", name: "Coinbase", scale: 2.1 },
   { slug: "replit", name: "Replit", scale: 1 },
   { slug: "stripe", name: "Stripe", scale: 1 },
-  { slug: "openai", name: "OpenAI", scale: 1 },
-  { slug: "anthropic", name: "Anthropic", scale: 1 },
   { slug: "palantir", name: "Palantir", scale: 1 },
-  { slug: "anduril", name: "Anduril", scale: 0.85 },
 ];
 
 const NAV = [
@@ -159,7 +172,8 @@ async function main() {
   console.log("\nPartner marks:");
   const partners = [];
   for (const partner of PARTNERS) {
-    const logo = await uploadImage(`partners/${partner.slug}.svg`);
+    const logo = await uploadImageIfPresent(`partners/${partner.slug}.svg`);
+    if (!logo) continue;
     const _id = `partner-${partner.slug}`;
     await client.createIfNotExists({
       _id,
@@ -252,13 +266,19 @@ async function main() {
       paragraphs: [
         "Maybe you were the person building something after school while everyone else was studying for the test.",
         "Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
-        "You are curious. You take initiative. You want your work to matter. And you want to spend the next two years around people who have the same intensity.",
+        "You are curious. You take initiative. You want your work to matter.",
+        "And you want to spend the next two years around people who have the same intensity.",
       ],
       cta: { _type: "cta", label: "Learn about admissions", href: "#admissions" },
     },
     peopleWall: {
       _type: "peopleWallSection",
+      layout: "wall",
       heading: "Meet the kind of people we’re looking for.",
+      paragraphs: [
+        "They’re already building, researching, experimenting, and pursuing ideas of their own.",
+        "Meet some of HAA’s early applicants and see what they’re working on.",
+      ],
       // The wall is four across by two down.
       tiles: keyed(people.slice(0, 8).map(ref)),
     },
@@ -267,6 +287,7 @@ async function main() {
       layout: "marquee",
       eyebrow: "Partners",
       heading: "Connected to the institutions shaping what comes next.",
+      body: "HAA is being built with a network spanning frontier technology, entrepreneurship, research, and industry.",
       logos: keyed(partners.map(ref)),
     },
     life: {
@@ -276,13 +297,28 @@ async function main() {
         ...skyline,
         alt: "San Francisco and the Bay Bridge at dusk, seen from across the bay",
       },
-      heading: "Two years in San Francisco.",
+      heading: "Residential in San Francisco.",
       paragraphs: [
         "HAA is residential because the people around you matter as much as the material you study.",
         "You will live and work alongside a small cohort of unusually driven peers, in a city where some of the most consequential technology companies and research labs in the world are being built.",
         "San Francisco becomes an extension of the Academy: the people you meet, the companies you visit, the conversations you stumble into, and the ideas circulating through the city.",
       ],
       cta: { _type: "cta", label: "Explore life at HAA", href: "/life" },
+    },
+    closing: {
+      _type: "closingSection",
+      layout: "quiet",
+      heading: "What will you pursue?",
+      paragraphs: [
+        "Bring your obsessions, your unfinished ideas, the questions you can\u2019t leave alone, and the things you have already started.",
+        "We\u2019ll give you exceptional peers, extraordinary teachers, access to a remarkable network, and room to pursue them seriously.",
+      ],
+      applyLabel: "Apply to HAA",
+      links: keyed([
+        { _type: "cta", label: "Explore the Program", href: "/program" },
+        { _type: "cta", label: "Meet the Network", href: "/network" },
+        { _type: "cta", label: "Admissions", href: "/admissions" },
+      ]),
     },
   });
   console.log("  homePage");

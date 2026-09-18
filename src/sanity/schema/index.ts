@@ -6,6 +6,7 @@ import { partner } from "./partner";
 import { person } from "./person";
 import {
   admissionsSection,
+  closingSection,
   heroSection,
   lifeSection,
   networkSection,
@@ -39,4 +40,5 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   peopleWallSection,
   partnersSection,
   lifeSection,
+  closingSection,
 ];

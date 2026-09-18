@@ -60,6 +60,20 @@ function cta(value: unknown, fallback: Cta): Cta {
   };
 }
 
+/** A whole row of links. A half-filled entry is dropped rather than rendered. */
+function ctas(value: unknown, fallback: Cta[]): Cta[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: Cta[] = [];
+  for (const entry of value) {
+    const raw = obj(entry);
+    const label = str(raw?.label, "");
+    const href = str(raw?.href, "");
+    if (!label || !href) continue;
+    kept.push({ label, href });
+  }
+  return kept.length ? kept : fallback;
+}
+
 function picture(value: unknown, fallback: Picture): Picture {
   const raw = obj(value);
   const src = imageUrl(raw as never, PLATE_WIDTH);
@@ -132,6 +146,7 @@ export function mergeContent(data: unknown): SiteContent {
   const peopleWall = obj(home?.peopleWall);
   const partners = obj(home?.partners);
   const life = obj(home?.life);
+  const closing = obj(home?.closing);
 
   return {
     settings: {
@@ -195,13 +210,19 @@ export function mergeContent(data: unknown): SiteContent {
         cta: cta(admissions?.cta, fallback.sections.admissions.cta),
       },
       people: {
+        layout: str(peopleWall?.layout, fallback.sections.people.layout),
         heading: str(peopleWall?.heading, fallback.sections.people.heading),
+        paragraphs: paragraphs(
+          peopleWall?.paragraphs,
+          fallback.sections.people.paragraphs,
+        ),
         tiles: portraits(peopleWall?.tiles, fallback.sections.people.tiles),
       },
       partners: {
         layout: str(partners?.layout, fallback.sections.partners.layout),
         eyebrow: str(partners?.eyebrow, fallback.sections.partners.eyebrow),
         heading: str(partners?.heading, fallback.sections.partners.heading),
+        body: str(partners?.body, fallback.sections.partners.body),
         logos: logos(partners?.logos, fallback.sections.partners.logos),
       },
       life: {
@@ -213,6 +234,26 @@ export function mergeContent(data: unknown): SiteContent {
           fallback.sections.life.paragraphs,
         ),
         cta: cta(life?.cta, fallback.sections.life.cta),
+      },
+      closing: {
+        layout: str(closing?.layout, fallback.sections.closing.layout),
+        heading: str(closing?.heading, fallback.sections.closing.heading),
+        paragraphs: paragraphs(
+          closing?.paragraphs,
+          fallback.sections.closing.paragraphs,
+        ),
+        // The label is the section's; the destination is the site's one
+        // apply link, so the nav button and this one can never drift.
+        apply: {
+          label: str(closing?.applyLabel, fallback.sections.closing.apply.label),
+          href: cta(settings?.applyCta, fallback.settings.applyCta).href,
+        },
+        links: ctas(closing?.links, fallback.sections.closing.links),
+        markPath: raw(
+          settings?.markPath,
+          fallback.sections.closing.markPath,
+          SVG_PATH,
+        ),
       },
     },
   };
