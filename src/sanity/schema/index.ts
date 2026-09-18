@@ -1,4 +1,5 @@
 import type { SchemaTypeDefinition } from "sanity";
+import { applicant } from "./applicant";
 import { homePage } from "./homePage";
 import { navigation } from "./navigation";
 import { cta, navPanel } from "./objects";
@@ -17,7 +18,7 @@ import {
 import { siteSettings } from "./siteSettings";
 
 /** Documents an editor can create more of, as opposed to the singletons. */
-export const COLLECTION_TYPES = ["person", "partner"] as const;
+export const COLLECTION_TYPES = ["person", "partner", "applicant"] as const;
 
 /** One of each, reached from the top of the structure sidebar. */
 export const SINGLETON_TYPES = ["siteSettings", "navigation", "homePage"] as const;
@@ -30,6 +31,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Collections
   person,
   partner,
+  applicant,
   // Objects
   cta,
   navPanel,

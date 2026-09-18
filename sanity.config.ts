@@ -1,5 +1,6 @@
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
+import { muxInput } from "sanity-plugin-mux-input";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { apiVersion, dataset, projectId, studioBasePath } from "./src/sanity/env";
@@ -42,5 +43,8 @@ export default defineConfig({
       },
     }),
     visionTool({ defaultApiVersion: apiVersion }),
+    // Credentials are entered once in the Studio UI, not here: the plugin
+    // keeps them in the dataset as `secrets.mux`.
+    muxInput(),
   ],
 });
