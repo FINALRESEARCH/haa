@@ -5,7 +5,7 @@
   --foreground: #111111;
   --brand: #fe3619;
   --panel: #efeeec;
-  --rule: rgba(17, 17, 17, 0.12);
+  --rule: rgba(0, 0, 0, 0.04);
 }
 
 @theme inline {
