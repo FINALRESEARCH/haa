@@ -2,24 +2,18 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import type { PartnerLogo } from "@/content/types";
+import type { VariantProps } from "@/variants/types";
 
-// Optical sizing: a couple of the files draw small inside their box.
-const LOGOS: { src: string; scale: number }[] = [
-  { src: "coinbase", scale: 2.1 },
-  { src: "google", scale: 1 },
-  { src: "meta", scale: 1 },
-  { src: "nvidia", scale: 1 },
-  { src: "replit", scale: 1 },
-  { src: "stripe", scale: 1 },
-  { src: "openai", scale: 1 },
-  { src: "anthropic", scale: 1 },
-  { src: "palantir", scale: 1 },
-  { src: "anduril", scale: 0.85 },
-].map(({ src, scale }) => ({ src: `/partners/${src}.svg`, scale }));
-
-function Row({ direction }: { direction: "left" | "right" }) {
+function Row({
+  direction,
+  logos,
+}: {
+  direction: "left" | "right";
+  logos: PartnerLogo[];
+}) {
   // The list is rendered twice so the loop can wrap seamlessly.
-  const marks = [...LOGOS, ...LOGOS];
+  const marks = [...logos, ...logos];
   return (
     <div className="overflow-hidden">
       <div
@@ -47,7 +41,7 @@ function Row({ direction }: { direction: "left" | "right" }) {
  * Partner logos drifting in opposite directions around the headline. The
  * screen is pinned and fades in, rather than being scrolled into view.
  */
-export default function Partners() {
+export default function PartnersV1({ id, content }: VariantProps<"partners">) {
   const sectionRef = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
 
@@ -64,7 +58,7 @@ export default function Partners() {
   }, []);
 
   return (
-    <div id="partners" className="h-[180vh]">
+    <div id={id} className="h-[180vh]">
       <section
         ref={sectionRef}
         className="sticky top-0 flex h-screen flex-col justify-center gap-[12vh] overflow-hidden bg-background"
@@ -74,13 +68,13 @@ export default function Partners() {
             shown ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Row direction="left" />
+          <Row direction="left" logos={content.logos} />
 
           <h2 className="px-6 text-center text-[clamp(1.5rem,3.45vw,3.9rem)] leading-[1.05] font-medium tracking-[-0.035em]">
-            Connected to the institutions shaping what comes next.
+            {content.heading}
           </h2>
 
-          <Row direction="right" />
+          <Row direction="right" logos={content.logos} />
         </div>
       </section>
     </div>

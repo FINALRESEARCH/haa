@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import type { VariantProps } from "@/variants/types";
 
 const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
 
@@ -9,7 +10,7 @@ const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
  * The "never been good at waiting" screen. The photo sits directly on top of
  * the copy and scrolls with it; the copy then arrives a beat at a time.
  */
-export default function Admissions() {
+export default function AdmissionsV1({ id, content }: VariantProps<"admissions">) {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -57,13 +58,13 @@ export default function Admissions() {
   return (
     <section
       ref={sectionRef}
-      id="admissions"
+      id={id}
       className="relative flex flex-col items-center bg-background px-6 pt-20 pb-[18vh]"
     >
       <div className="relative aspect-[1053/536] w-[min(1050px,88vw)] overflow-hidden rounded-xl">
         <Image
-          src="/workshop.jpg"
-          alt="A student working at a bench of half-built electronics"
+          src={content.image.src}
+          alt={content.image.alt}
           fill
           sizes="(max-width: 1200px) 88vw, 1050px"
           className="object-cover"
@@ -75,7 +76,7 @@ export default function Admissions() {
           ref={headingRef}
           className="text-[clamp(2.25rem,4.2vw,4.5rem)] leading-[1.12] font-medium tracking-[-0.035em] opacity-0 will-change-[opacity]"
         >
-          For people who have never been good at waiting.
+          {content.heading}
         </h2>
 
         <div className="flex flex-col">
@@ -83,21 +84,9 @@ export default function Admissions() {
             ref={bodyRef}
             className="space-y-7 text-[clamp(1rem,1.2vw,1.25rem)] leading-[1.4] tracking-[-0.01em] opacity-0 will-change-[opacity]"
           >
-            <p>
-              Maybe you were the person building something after school while
-              everyone else was studying for the test.
-            </p>
-            <p>
-              Maybe you joined the robotics club, started a company, taught
-              yourself to code, obsessed over an obscure subject, made films,
-              ran events, built machines, wrote constantly, or found some other
-              thing you couldn&apos;t stop thinking about.
-            </p>
-            <p>
-              You are curious. You take initiative. You want your work to
-              matter. And you want to spend the next two years around people who
-              have the same intensity.
-            </p>
+            {content.paragraphs.map((paragraph) => (
+              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+            ))}
           </div>
 
           <div
@@ -105,10 +94,10 @@ export default function Admissions() {
             className="mt-12 md:mt-auto md:pt-12 opacity-0 will-change-[opacity]"
           >
             <a
-              href="#admissions"
+              href={content.cta.href}
               className="label inline-flex items-center gap-2 text-brand"
             >
-              Learn about admissions <span aria-hidden>→</span>
+              {content.cta.label} <span aria-hidden>→</span>
             </a>
           </div>
         </div>

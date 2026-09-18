@@ -1,20 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { VariantProps } from "@/variants/types";
 
 // The hero pins for this many viewport heights while the mark sweeps across.
 const HERO_SCROLL_VH = 1.2;
-
-// The HAA mark, straight from RESOURCES/Vector.svg.
-const MARK_PATH =
-  "M19.0845 26.449H11.0349V0H19.0845V26.449ZM38.1449 26.449H30.0953L22.7519 0H30.8013L38.1449 26.449ZM52.5017 26.449H44.4521L37.1087 0H45.1583L52.5017 26.449ZM7.4751 16.9619H0V9.48684H7.4751V16.9619Z";
 
 // How far the mark sits on screen at rest, as a share of its own width.
 const REST_DESKTOP = 88;
 const REST_MOBILE = 58;
 const restShare = () => (window.innerWidth < 640 ? REST_MOBILE : REST_DESKTOP);
 
-export default function Hero() {
+export default function HeroV1({ id, content }: VariantProps<"hero">) {
+  const { markPath } = content;
   const markRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +84,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div style={{ height: `${100 + HERO_SCROLL_VH * 100}vh` }}>
+    <div id={id} style={{ height: `${100 + HERO_SCROLL_VH * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-background">
         <div
           aria-hidden
@@ -104,7 +102,7 @@ export default function Hero() {
               className="h-full w-full"
               fill="var(--brand)"
             >
-              <path d={MARK_PATH} />
+              <path d={markPath} />
             </svg>
           </div>
         </div>
@@ -115,8 +113,7 @@ export default function Hero() {
         >
           <section className="flex flex-1 items-start justify-center px-6 pt-[300px] pb-10 sm:items-center sm:pt-40 sm:pb-16">
             <h1 className="w-[min(1200px,92vw)] text-[clamp(2.25rem,10vw,5.5rem)] leading-[1.06] font-medium tracking-[-0.035em] sm:text-center sm:text-[clamp(2.5rem,4.9vw,5.5rem)] sm:leading-[1.02]">
-              A two-year residential academy for unusually ambitious young
-              people.
+              {content.headline}
             </h1>
           </section>
           <section
@@ -124,15 +121,13 @@ export default function Hero() {
             className="flex flex-col items-center gap-10 px-6 pb-16 sm:gap-6 sm:text-center"
           >
             <p className="w-full max-w-[62ch] text-[15px] leading-[1.5] text-foreground/80 sm:text-[14px] sm:leading-[1.6]">
-              For students who would rather spend their time making,
-              investigating, experimenting, and pursuing difficult questions
-              than preparing for a life that starts later.
+              {content.body}
             </p>
             <a
-              href="#apply"
+              href={content.cta.href}
               className="label rounded-lg border border-[#F2E7E5] bg-[#FFF4F2] px-8 py-3.5 text-brand transition-colors hover:bg-brand hover:text-white"
             >
-              Apply to HAA
+              {content.cta.label}
             </a>
           </section>
         </div>

@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { people } from "./people";
+import type { VariantProps } from "@/variants/types";
 
 // The section pins for this many viewport heights while the grid grows in.
 const SECTION_SCROLL_VH = 1;
 
 const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
 
-export default function Network() {
+export default function NetworkV1({ id, content }: VariantProps<"network">) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -59,7 +59,7 @@ export default function Network() {
   return (
     <div
       ref={wrapRef}
-      id="faculty"
+      id={id}
       // Rides up a little into the tail of the hero so the two screens meet.
       className="-mt-[25vh]"
       style={{ height: `${100 + SECTION_SCROLL_VH * 100}vh` }}
@@ -69,14 +69,14 @@ export default function Network() {
           ref={headingRef}
           className="w-[min(1100px,92vw)] opacity-0 text-center text-[clamp(1.75rem,3.6vw,3.5rem)] font-medium leading-[1.02] tracking-[-0.035em] will-change-[opacity]"
         >
-          Learn from people shaping the world.
+          {content.heading}
         </h2>
 
         <div
           ref={gridRef}
           className="grid w-[min(1150px,88vw)] grid-cols-2 gap-2 opacity-0 will-change-[opacity,transform] sm:grid-cols-3 lg:grid-cols-5"
         >
-          {people.map((person) => (
+          {content.portraits.map((person) => (
             <div
               key={person.src}
               className="group relative aspect-square overflow-hidden rounded-[10px]"
@@ -104,15 +104,13 @@ export default function Network() {
           className="flex flex-col items-center gap-5 text-center opacity-0 will-change-[opacity]"
         >
           <p className="max-w-[54ch] text-[clamp(0.95rem,1.15vw,1.125rem)] leading-[1.5]">
-            A rotating community of founders, scientists, engineers, investors,
-            artists, and operators teach at HAA, speak with students, offer
-            mentorship, and open doors to Silicon Valley and the world.
+            {content.body}
           </p>
           <a
-            href="#network"
+            href={content.cta.href}
             className="label inline-flex items-center gap-2 text-brand"
           >
-            Explore the network <span aria-hidden>→</span>
+            {content.cta.label} <span aria-hidden>→</span>
           </a>
         </div>
       </section>

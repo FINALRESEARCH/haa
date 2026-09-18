@@ -43,3 +43,9 @@ next-env.d.ts
 
 # local design references
 /RESOURCES
+
+# figmog MCP tool local socket
+/.figmog
+
+# env files (can opt-in for committing if needed)
+!.env.example

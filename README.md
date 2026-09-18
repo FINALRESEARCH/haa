@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HAA
 
-## Getting Started
+The Horowitz Andreessen Academy site. Next.js 16 (App Router, Turbopack) with an
+embedded Sanity Studio.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # then paste in the two tokens
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Site: <http://localhost:3000>
+- Studio: <http://localhost:3000/studio>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Everything on the page is editable in the Studio. Nothing is hard-coded in a
+component any more:
 
-## Learn More
+| Studio document   | What it drives                                               |
+| ----------------- | ------------------------------------------------------------ |
+| **Home page**     | All six screens — hero, network, program, admissions, people wall, partners. Copy, links, images, and which partner layout ships. |
+| **Navigation**    | The menu bar and each drop-down panel.                        |
+| **Site settings** | Page title and description, the nav button, the logo and wordmark, the mark's SVG path, and the five theme colours. |
+| **People**        | Portraits used by the network grid and the people wall.       |
+| **Partners**      | Partner marks, with a per-mark optical scale.                 |
 
-To learn more about Next.js, take a look at the following resources:
+`src/content/defaults.ts` holds the site exactly as it read before Sanity, and
+backs every field. If a field is cleared, or the Content Lake is unreachable,
+that value renders instead of a hole.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Seeding
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run sanity:seed
+```
 
-## Deploy on Vercel
+Uploads everything in `public/` as Sanity assets and writes the documents. It
+uses `createIfNotExists`, so it never overwrites an editor's work — delete a
+document in the Studio first if you want it rebuilt.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Previewing drafts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The Studio's **Presentation** tool renders the site next to the editor with
+click-to-edit overlays. Published changes stream to open pages over Sanity's
+Live Content API, so a publish shows up without a redeploy.
+
+## Variants
+
+Some sections ship more than one layout. The Studio picks the default (Home
+page → Partners → Layout); `?partners=2` still overrides it locally, and the
+switcher in the bottom-right corner writes those params. The switcher is
+compiled out of production builds unless `NEXT_PUBLIC_VARIANTS=1`.
+
+Adding a variant: drop `v2.tsx` into the section's folder, add a line to its
+`index.ts`, and — if the section has a layout picker — add the matching option
+in `src/sanity/schema/sections.ts`.
+
+## Deploying
+
+Set the four variables from `.env.example` on the host (`SANITY_API_WRITE_TOKEN`
+is not needed at runtime), and add the deployed origin under
+[CORS origins](https://www.sanity.io/manage/project/itsaouhp/api) so the Studio
+can reach the API from it.
+
+## Layout
+
+```
+src/app/(site)      the marketing site: palette, live content, editing overlays
+src/app/studio      the embedded Studio
+src/content         the content shape and its defaults
+src/sanity          client, queries, schema, and the Sanity → props mapper
+src/variants        the section registry behind the layout switcher
+```

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { VariantProps } from "@/variants/types";
 
 const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
 
@@ -9,7 +10,7 @@ const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
  * pinned: it scrolls up over the previous screen, and each block fades in as
  * it rises into view.
  */
-export default function Program() {
+export default function ProgramV1({ id, content }: VariantProps<"program">) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Program() {
   return (
     <section
       ref={sectionRef}
-      id="program"
+      id={id}
       className="relative flex flex-col items-center gap-16 bg-background px-6 pt-[6vh] pb-0"
     >
       <div
@@ -52,10 +53,10 @@ export default function Program() {
         className="w-[92vw] text-center opacity-0 will-change-[opacity]"
       >
         <h2 className="text-[clamp(1.65rem,3.4vw,3.75rem)] font-medium leading-[1.05] tracking-[-0.035em]">
-          Build your education around what you want to pursue.
+          {content.heading}
         </h2>
         <p className="mt-3 text-[clamp(0.85rem,1vw,1rem)] font-medium">
-          HAA is a two-year residential alternative to traditional college.
+          {content.subheading}
         </p>
       </div>
 
@@ -63,25 +64,17 @@ export default function Program() {
         data-reveal
         className="w-[min(760px,88vw)] space-y-8 text-center text-[clamp(1.05rem,1.5vw,1.4rem)] leading-[1.35] tracking-[-0.01em] opacity-0 will-change-[opacity]"
       >
-        <p>
-          Most of your time is spent on self-directed pursuits: starting a
-          company, building a technical system, conducting research, making art,
-          writing, mastering a new field, or following an idea far enough to
-          discover where it leads.
-        </p>
-        <p>
-          Around that work, you can choose intensive courses taught by industry
-          leaders, seek guidance from mentors, spend three months working inside
-          a company, and go explore the world.
-        </p>
+        {content.paragraphs.map((paragraph) => (
+          <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+        ))}
       </div>
 
       <div data-reveal className="opacity-0 will-change-[opacity]">
         <a
-          href="#curriculum"
+          href={content.cta.href}
           className="label inline-flex items-center gap-2 text-brand"
         >
-          Explore the program <span aria-hidden>→</span>
+          {content.cta.label} <span aria-hidden>→</span>
         </a>
       </div>
 

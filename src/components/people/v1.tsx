@@ -2,17 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-
-const TILES = Array.from(
-  { length: 8 },
-  (_, i) => `/portraits/portrait-${String(i + 1).padStart(2, "0")}.jpg`,
-);
+import type { VariantProps } from "@/variants/types";
 
 /**
  * "Meet the kind of people we're looking for." The line lands on its own, then
  * the wall of portraits animates in on a timer rather than on scroll.
  */
-export default function PeopleWall() {
+export default function PeopleWallV1({ id, content }: VariantProps<"people">) {
   const sectionRef = useRef<HTMLElement>(null);
   const [headingIn, setHeadingIn] = useState(false);
   const [tilesIn, setTilesIn] = useState(false);
@@ -45,15 +41,15 @@ export default function PeopleWall() {
   }, []);
 
   return (
-    <div id="people" className="h-[180vh]">
+    <div id={id} className="h-[180vh]">
       <section
         ref={sectionRef}
         className="sticky top-0 h-screen overflow-hidden bg-background p-3 pt-[108px]"
       >
         <div className="grid h-full grid-cols-2 grid-rows-4 gap-3 sm:grid-cols-4 sm:grid-rows-2">
-          {TILES.map((src, i) => (
+          {content.tiles.map((tile, i) => (
             <div
-              key={src}
+              key={tile.src}
               style={{ transitionDelay: `${(i % 4) * 70}ms` }}
               className={`relative overflow-hidden rounded-[10px] transition-[opacity,transform] duration-700 ease-out ${
                 tilesIn
@@ -62,7 +58,7 @@ export default function PeopleWall() {
               }`}
             >
               <Image
-                src={src}
+                src={tile.src}
                 alt=""
                 fill
                 sizes="(max-width: 640px) 50vw, 25vw"
@@ -77,7 +73,7 @@ export default function PeopleWall() {
             headingIn ? "opacity-100" : "opacity-0"
           }`}
         >
-          Meet the kind of people we&apos;re looking for.
+          {content.heading}
         </h2>
       </section>
     </div>

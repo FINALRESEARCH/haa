@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { getSiteContent } from "@/sanity/content";
 import "./globals.css";
 
 const nudge = localFont({
@@ -16,11 +17,10 @@ const groteskMono = localFont({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "The Horowitz Andreessen Academy",
-  description:
-    "A two-year residential academy for unusually ambitious young people.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getSiteContent();
+  return { title: settings.title, description: settings.description };
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${nudge.variable} ${groteskMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
