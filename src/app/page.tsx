@@ -2,6 +2,7 @@ import Admissions from "@/components/Admissions";
 import Hero from "@/components/Hero";
 import Nav from "@/components/Nav";
 import Network from "@/components/Network";
+import PeopleWall from "@/components/PeopleWall";
 import Program from "@/components/Program";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
         <Network />
         <Program />
         <Admissions />
+        <PeopleWall />
       </main>
     </>
   );

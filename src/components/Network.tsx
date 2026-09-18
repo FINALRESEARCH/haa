@@ -37,7 +37,9 @@ export default function Network() {
       heading.style.opacity = `${clamp((p - 0.02) / 0.1)}`;
       // The grid grows from 75% in the middle of the screen...
       const growth = clamp((p - 0.42) / 0.3);
-      grid.style.transform = `scale(${0.75 + 0.25 * growth})`;
+      // ...and scales back down again as the screen hands over.
+      const exit = clamp((p - 0.88) / 0.12);
+      grid.style.transform = `scale(${(0.75 + 0.25 * growth) * (1 - 0.18 * exit)})`;
       grid.style.opacity = `${clamp((p - 0.42) / 0.12)}`;
       // ...and only then does the supporting copy arrive.
       copy.style.opacity = `${clamp((p - 0.62) / 0.08)}`;

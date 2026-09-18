@@ -101,20 +101,28 @@ export default function Nav() {
 
         <Rule />
 
-        <button
-          type="button"
-          onClick={() => {
-            setCollapsed(false);
-            setMobileOpen(true);
-          }}
-          aria-label="Open menu"
-          aria-expanded={false}
-          className={`w-full items-center justify-center py-1.5 text-foreground/50 transition-colors hover:text-foreground ${
-            mobileOpen ? "hidden" : "flex"
-          } ${collapsed ? "sm:flex" : "sm:hidden"}`}
+        {/* The chevron row shrinks as the menu grows, so the card only ever
+            slides one way. */}
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+            mobileOpen ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+          } ${collapsed ? "sm:grid-rows-[1fr]" : "sm:grid-rows-[0fr]"}`}
         >
-          <Chevron className="h-3.5 w-3.5" />
-        </button>
+          <div className="overflow-hidden">
+            <button
+              type="button"
+              onClick={() => {
+                setCollapsed(false);
+                setMobileOpen(true);
+              }}
+              aria-label="Open menu"
+              aria-expanded={false}
+              className="flex w-full items-center justify-center py-1.5 text-foreground/50 transition-colors hover:text-foreground"
+            >
+              <Chevron className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
 
         <div
           className={`grid transition-[grid-template-rows] duration-300 ease-out ${

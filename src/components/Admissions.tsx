@@ -27,14 +27,18 @@ export default function Admissions() {
       frame = 0;
       const vh = window.innerHeight;
       // 0 as the copy meets the bottom of the screen, 1 once it has risen.
-      const stage = (el: HTMLElement, from: number, over = 0.14) => {
+      const stage = (el: HTMLElement, from: number, over = 0.08) => {
         const { top } = el.getBoundingClientRect();
         const p = clamp((vh - top) / vh);
         el.style.opacity = `${clamp((p - from) / over)}`;
       };
       stage(heading, 0.05);
-      stage(body, 0.1);
-      stage(cta, 0.12);
+      stage(body, 0.08);
+      stage(cta, 0.1, 0.05);
+
+      // The whole screen fades out as it leaves, handing over to the wall.
+      const { bottom } = section.getBoundingClientRect();
+      section.style.opacity = `${clamp(bottom / (vh * 0.75))}`;
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(apply);
