@@ -55,10 +55,7 @@ export default function Network() {
     <div
       ref={wrapRef}
       id="faculty"
-      // Overlaps the tail of the hero so the section is already in place and
-      // simply fades in, rather than sliding up the screen.
-      className="-mt-[100vh]"
-      style={{ height: `${200 + SECTION_SCROLL_VH * 100}vh` }}
+      style={{ height: `${100 + SECTION_SCROLL_VH * 100}vh` }}
     >
       <section className="sticky top-0 flex h-screen flex-col items-center justify-center gap-8 overflow-hidden bg-background px-6 pt-[150px] pb-10">
         <h2

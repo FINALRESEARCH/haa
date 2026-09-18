@@ -5,16 +5,12 @@ import { useEffect, useRef } from "react";
 // The hero pins for this many viewport heights while the mark sweeps across.
 const HERO_SCROLL_VH = 1.5;
 
-// The mark's bars, at the slant Vector.svg draws them (15.5 deg off vertical).
-// `right`/`width` are in vw and match the resting composition in the mocks;
-// the whole group sweeps left and grows as the hero scrolls.
-const BARS = [
-  { right: -8, width: 4 },
-  { right: 10, width: 18 },
-  { right: 112, width: 30 },
-  { right: 148, width: 30 },
-  { right: 184, width: 30 },
-];
+// The HAA mark, straight from RESOURCES/Vector.svg.
+const MARK_PATH =
+  "M19.0845 26.449H11.0349V0H19.0845V26.449ZM38.1449 26.449H30.0953L22.7519 0H30.8013L38.1449 26.449ZM52.5017 26.449H44.4521L37.1087 0H45.1583L52.5017 26.449ZM7.4751 16.9619H0V9.48684H7.4751V16.9619Z";
+
+// How far the mark sits on screen at rest, as a share of its own width.
+const REST = 10;
 
 export default function Hero() {
   const markRef = useRef<HTMLDivElement>(null);
@@ -37,10 +33,11 @@ export default function Hero() {
       const distance = window.innerHeight * HERO_SCROLL_VH;
       const p = Math.min(Math.max(window.scrollY / distance, 0), 1);
 
-      // The mark sweeps left and grows as it goes, as in the mock frames.
-      const travel = mark.offsetWidth * 0.85;
-      const entrance = intro * window.innerWidth * 1.15;
-      mark.style.transform = `translate3d(${entrance - p * travel}px,0,0) scale(${1 + p * 0.6})`;
+      // The mark sweeps left off the screen and grows as it goes.
+      const travel = mark.offsetWidth * 1.35 + window.innerWidth;
+      const entrance = intro * window.innerWidth * 0.5;
+      const x = entrance - p * travel;
+      mark.style.transform = `translate3d(calc(-${REST}% + ${x}px),-50%,0) scale(${1 + p * 0.35})`;
 
       // The copy fades out over the first half of the sweep.
       copy.style.opacity = `${Math.max(0, 1 - p / 0.5)}`;
@@ -85,16 +82,17 @@ export default function Hero() {
           <div
             ref={markRef}
             // Starts off-screen right so the first paint matches the entrance.
-            style={{ transform: "translate3d(115vw,0,0)" }}
-            className="absolute inset-y-0 right-0 w-[230vw] origin-[95%_50%] will-change-transform"
+            style={{ transform: `translate3d(calc(-${REST}% + 100vw),-50%,0)` }}
+            className="absolute top-1/2 left-full h-[150vh] w-[295vh] origin-left will-change-transform"
           >
-            {BARS.map((bar) => (
-              <div
-                key={bar.right}
-                className="absolute -top-1/2 -bottom-1/2 -rotate-[15.5deg] bg-brand"
-                style={{ right: `${bar.right}vw`, width: `${bar.width}vw` }}
-              />
-            ))}
+            <svg
+              viewBox="0 0 53 27"
+              preserveAspectRatio="none"
+              className="h-full w-full"
+              fill="var(--brand)"
+            >
+              <path d={MARK_PATH} />
+            </svg>
           </div>
         </div>
 

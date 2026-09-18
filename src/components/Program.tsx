@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
@@ -45,7 +46,7 @@ export default function Program() {
     <section
       ref={sectionRef}
       id="program"
-      className="relative flex flex-col items-center gap-20 bg-background px-6 pt-[22vh] pb-24"
+      className="relative flex flex-col items-center gap-20 bg-background px-6 pt-[22vh] pb-0"
     >
       <div
         data-reveal
@@ -85,11 +86,18 @@ export default function Program() {
         </a>
       </div>
 
-      {/* Placeholder: no photo for this block shipped with the mocks. */}
       <div
         data-reveal
-        className="aspect-[16/7] w-[min(1050px,88vw)] rounded-xl bg-[linear-gradient(135deg,#dcd9d4,#c9c5bf)] opacity-0 will-change-[opacity]"
-      />
+        className="relative aspect-[1053/536] w-[min(1050px,88vw)] overflow-hidden rounded-xl opacity-0 will-change-[opacity]"
+      >
+        <Image
+          src="/workshop.jpg"
+          alt="A student working at a bench of half-built electronics"
+          fill
+          sizes="(max-width: 1200px) 88vw, 1050px"
+          className="object-cover"
+        />
+      </div>
     </section>
   );
 }

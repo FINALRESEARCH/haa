@@ -1,3 +1,4 @@
+import Admissions from "@/components/Admissions";
 import Hero from "@/components/Hero";
 import Nav from "@/components/Nav";
 import Network from "@/components/Network";
@@ -11,6 +12,7 @@ export default function Home() {
         <Hero />
         <Network />
         <Program />
+        <Admissions />
       </main>
     </>
   );
