@@ -3,10 +3,19 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-const LOGOS = Array.from(
-  { length: 6 },
-  (_, i) => `/partners/p-${String(i + 1).padStart(2, "0")}.png`,
-);
+// Optical sizing: a couple of the files draw small inside their box.
+const LOGOS: { src: string; scale: number }[] = [
+  { src: "coinbase", scale: 2.1 },
+  { src: "google", scale: 1 },
+  { src: "meta", scale: 1 },
+  { src: "nvidia", scale: 1 },
+  { src: "replit", scale: 1 },
+  { src: "stripe", scale: 1 },
+  { src: "openai", scale: 1 },
+  { src: "anthropic", scale: 1 },
+  { src: "palantir", scale: 1 },
+  { src: "anduril", scale: 0.85 },
+].map(({ src, scale }) => ({ src: `/partners/${src}.svg`, scale }));
 
 function Row({ direction }: { direction: "left" | "right" }) {
   // The list is rendered twice so the loop can wrap seamlessly.
@@ -18,14 +27,15 @@ function Row({ direction }: { direction: "left" | "right" }) {
           direction === "left" ? "marquee-left" : "marquee-right"
         }`}
       >
-        {marks.map((src, i) => (
+        {marks.map(({ src, scale }, i) => (
           <Image
             key={`${src}-${i}`}
             src={src}
             alt=""
             width={140}
             height={68}
-            className="h-[clamp(26px,3.2vw,46px)] w-auto object-contain"
+            style={{ height: `calc(clamp(26px, 3.2vw, 46px) * ${scale})` }}
+            className="w-auto max-w-[190px] object-contain [filter:brightness(0)]"
           />
         ))}
       </div>

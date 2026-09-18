@@ -28,7 +28,7 @@ export default function PeopleWall() {
         if (entry.isIntersecting) {
           setHeadingIn(true);
           // The line reads on its own for a beat, then the wall arrives.
-          timer = setTimeout(() => setTilesIn(true), 1600);
+          timer = setTimeout(() => setTilesIn(true), 800);
         } else {
           // Scrolling back off takes the wall away again.
           setHeadingIn(false);
@@ -48,7 +48,7 @@ export default function PeopleWall() {
     <div id="people" className="h-[180vh]">
       <section
         ref={sectionRef}
-        className="sticky top-0 h-screen overflow-hidden bg-background p-3"
+        className="sticky top-0 h-screen overflow-hidden bg-background p-3 pt-[108px]"
       >
         <div className="grid h-full grid-cols-2 grid-rows-4 gap-3 sm:grid-cols-4 sm:grid-rows-2">
           {TILES.map((src, i) => (
