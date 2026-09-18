@@ -60,7 +60,7 @@ export default function Network() {
       className="-mt-[100vh]"
       style={{ height: `${200 + SECTION_SCROLL_VH * 100}vh` }}
     >
-      <section className="sticky top-0 flex h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pt-[150px] pb-10">
+      <section className="sticky top-0 flex h-screen flex-col items-center justify-center gap-8 overflow-hidden bg-background px-6 pt-[150px] pb-10">
         <h2
           ref={headingRef}
           className="w-[min(1100px,92vw)] opacity-0 text-center text-[clamp(1.75rem,3.6vw,3.5rem)] font-medium leading-[1.02] tracking-[-0.035em] will-change-[opacity]"

@@ -54,7 +54,7 @@ export default function Hero() {
 
   return (
     <div style={{ height: `${100 + HERO_SCROLL_VH * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden">
+      <div className="sticky top-0 h-screen overflow-hidden bg-background">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
