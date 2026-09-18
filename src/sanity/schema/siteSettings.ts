@@ -25,6 +25,7 @@ export const siteSettings = defineType({
   groups: [
     { name: "meta", title: "Metadata", default: true },
     { name: "identity", title: "Identity" },
+    { name: "seo", title: "SEO & sharing" },
     { name: "theme", title: "Theme" },
   ],
   fields: [
@@ -72,6 +73,23 @@ export const siteSettings = defineType({
       description:
         "The `d` attribute of the HAA mark, drawn on a 53 × 27 viewBox. Used for the nav mark and the hero sweep.",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "favicon",
+      type: "image",
+      group: "seo",
+      description:
+        "The browser tab, bookmark, and home-screen icon. Placeholder for now (the HAA mark) — ideally replace with a purpose-drawn square icon before launch.",
+      options: { accept: "image/svg+xml,image/png,image/x-icon" },
+    }),
+    defineField({
+      name: "ogImage",
+      title: "Sharing image — ⚠️ action item, pending from client",
+      type: "image",
+      group: "seo",
+      description:
+        "Shown when the site is shared on social media, Slack, or iMessage. Recommended size 1200 × 630px (JPG or PNG). Left blank on purpose — the client still needs to supply final artwork. Until it's set, shares show no preview image rather than a wrong one.",
+      options: { hotspot: true },
     }),
     colour("background", "Background", "Page background, `--background`."),
     colour("foreground", "Foreground", "Body text, `--foreground`."),

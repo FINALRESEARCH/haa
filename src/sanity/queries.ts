@@ -14,6 +14,8 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
     fullLogo,
     wordmark,
     markPath,
+    favicon,
+    ogImage,
     background,
     foreground,
     brand,

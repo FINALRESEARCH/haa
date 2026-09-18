@@ -20,6 +20,10 @@ export const DEFAULT_CONTENT: SiteContent = {
     fullLogo: "/full-logo.svg",
     wordmark: "/wordmark.svg",
     markPath: MARK_PATH,
+    // Placeholder until a purpose-drawn square icon replaces it.
+    favicon: "/mark.svg",
+    // Genuinely blank: the client hasn't supplied share artwork yet.
+    ogImage: null,
     theme: {
       background: "#f7f6f4",
       foreground: "#111111",

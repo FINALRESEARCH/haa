@@ -192,6 +192,8 @@ async function main() {
   const wordmark = await uploadImage("wordmark.svg");
   const workshop = await uploadImage("workshop.jpg");
   const skyline = await uploadImage("life/sf.jpg");
+  // Placeholder favicon until a purpose-drawn square icon replaces it.
+  const favicon = await uploadImage("mark.svg");
 
   console.log("\nDocuments:");
   await client.createIfNotExists({
@@ -203,6 +205,8 @@ async function main() {
     fullLogo,
     wordmark,
     markPath: MARK_PATH,
+    favicon,
+    // ogImage intentionally omitted — action item, pending from the client.
     background: "#f7f6f4",
     foreground: "#111111",
     brand: "#fe3619",

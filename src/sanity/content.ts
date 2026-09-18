@@ -17,6 +17,8 @@ import { SITE_CONTENT_QUERY } from "./queries";
 const PORTRAIT_WIDTH = 800;
 const PLATE_WIDTH = 2100;
 const LOGO_WIDTH = 400;
+// Crawlers read this at face value; no need to serve it at retina width.
+const OG_IMAGE_WIDTH = 1200;
 
 type Raw = Record<string, unknown> | null | undefined;
 
@@ -160,6 +162,11 @@ export function mergeContent(data: unknown): SiteContent {
         imageUrl(settings?.wordmark as never, LOGO_WIDTH) ??
         fallback.settings.wordmark,
       markPath: raw(settings?.markPath, fallback.settings.markPath, SVG_PATH),
+      favicon:
+        imageUrl(settings?.favicon as never, LOGO_WIDTH) ??
+        fallback.settings.favicon,
+      // No fallback: blank means blank until the client supplies one.
+      ogImage: imageUrl(settings?.ogImage as never, OG_IMAGE_WIDTH) ?? null,
       theme: {
         background: raw(settings?.background, fallback.settings.theme.background, COLOUR),
         foreground: raw(settings?.foreground, fallback.settings.theme.foreground, COLOUR),

@@ -151,6 +151,15 @@ export type SiteSettings = {
   wordmark: string;
   /** The `d` attribute of the HAA mark, on a 53 × 27 viewBox. */
   markPath: string;
+  /** Browser tab / bookmark / home-screen icon. Always has a value. */
+  favicon: string;
+  /**
+   * The social-share preview image (og:image / twitter:image). Unlike every
+   * other field here, `null` is a real, intended state: it stays blank until
+   * the client supplies final artwork, rather than falling back to a
+   * placeholder that would ship as if it were the real thing.
+   */
+  ogImage: string | null;
   theme: Theme;
 };
 
