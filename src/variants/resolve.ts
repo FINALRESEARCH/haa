@@ -3,16 +3,12 @@ import { SECTIONS } from "./registry";
 import type { SectionDef, Selection } from "./types";
 
 /**
- * The switcher runs locally and on preview deploys, but is compiled out of a
- * real production build unless NEXT_PUBLIC_VARIANTS opts back in.
+ * The switcher runs everywhere, including production deploys, so a variant
+ * combination can be demoed from the live URL. Set NEXT_PUBLIC_VARIANTS=0 to
+ * turn it off once the site is public.
  */
 export function variantsEnabled(): boolean {
-  if (process.env.NEXT_PUBLIC_VARIANTS === "1") return true;
-  if (process.env.NEXT_PUBLIC_VARIANTS === "0") return false;
-  return (
-    process.env.NODE_ENV !== "production" ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-  );
+  return process.env.NEXT_PUBLIC_VARIANTS !== "0";
 }
 
 /**

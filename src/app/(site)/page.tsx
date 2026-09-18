@@ -12,8 +12,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const content = await getSiteContent();
   const enabled = variantsEnabled();
   const defaults = defaultSelection(content);
-  // `searchParams` is only awaited when the switcher is on, so a production
-  // build without it stays statically prerendered.
+  // Awaiting `searchParams` opts the route into dynamic rendering, which is
+  // the cost of letting a variant combination be shared as a live URL.
   const selection = enabled
     ? selectionFromParams(await searchParams, content)
     : defaults;
