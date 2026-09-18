@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
@@ -86,18 +85,6 @@ export default function Program() {
         </a>
       </div>
 
-      <div
-        data-reveal
-        className="relative aspect-[1053/536] w-[min(1050px,88vw)] overflow-hidden rounded-xl opacity-0 will-change-[opacity]"
-      >
-        <Image
-          src="/workshop.jpg"
-          alt="A student working at a bench of half-built electronics"
-          fill
-          sizes="(max-width: 1200px) 88vw, 1050px"
-          className="object-cover"
-        />
-      </div>
     </section>
   );
 }
