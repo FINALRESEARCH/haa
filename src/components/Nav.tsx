@@ -101,7 +101,7 @@ export default function Nav() {
                 aria-expanded={openId === section.id}
                 className={`relative flex-1 py-3 transition-colors ${
                   i > 0
-                    ? "before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-rule before:content-['']"
+                    ? "before:absolute before:inset-y-2 before:left-0 before:w-px before:bg-rule before:content-['']"
                     : ""
                 } ${
                   openId === section.id
