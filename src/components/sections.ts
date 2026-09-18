@@ -30,7 +30,7 @@ export const sections: Section[] = [
     label: "Student Life",
     heading: "A residential campus built for making things.",
     body: [
-      "Everyone lives on campus for two years, surrounded by people doing unreasonably ambitious work.",
+      "Everyone lives on campus, surrounded by people doing unreasonably ambitious work.",
       "Studios, labs, and shops stay open late, and the day is structured around the work rather than around the timetable.",
     ],
   },
@@ -46,7 +46,7 @@ export const sections: Section[] = [
   {
     id: "about",
     label: "About",
-    heading: "A two-year residential academy.",
+    heading: "A residential academy in San Francisco.",
     body: [
       "The Horowitz Andreessen Academy exists for students who would rather spend their time making, investigating, and experimenting than preparing for a life that starts later.",
     ],

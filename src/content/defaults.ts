@@ -14,8 +14,7 @@ const MARK_PATH =
 export const DEFAULT_CONTENT: SiteContent = {
   settings: {
     title: "The Horowitz Andreessen Academy",
-    description:
-      "A two-year residential academy for unusually ambitious young people.",
+    description: "An academy for unusually ambitious young people.",
     applyCta: { label: "Apply Now", href: "#apply" },
     fullLogo: "/full-logo.svg",
     wordmark: "/wordmark.svg",
@@ -39,16 +38,15 @@ export const DEFAULT_CONTENT: SiteContent = {
 
   sections: {
     hero: {
-      headline:
-        "A two-year residential academy for unusually ambitious young people.",
-      body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions than preparing for a life that starts later.",
+      headline: "An academy for unusually ambitious young people.",
+      body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
       cta: { label: "Apply to HAA", href: "#apply" },
       markPath: MARK_PATH,
     },
 
     network: {
       heading: "Learn from people shaping the world.",
-      body: "A rotating community of founders, scientists, engineers, investors, artists, and operators teach at HAA, speak with students, offer mentorship, and open doors to Silicon Valley and the world.",
+      body: "A community of founders, scientists, engineers, investors, designers, and operators teach at HAA, speak with students, offer mentorship, and open doors to Silicon Valley and the world.",
       cta: { label: "Explore the network", href: "#network" },
       portraits: people,
     },
@@ -56,7 +54,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     program: {
       heading: "Build your education around what you want to pursue.",
       subheading:
-        "HAA is a two-year residential alternative to traditional college.",
+        "HAA is a San Francisco-based residential alternative to the traditional college path.",
       paragraphs: [
         "Most of your time is spent on self-directed pursuits: starting a company, building a technical system, conducting research, making art, writing, mastering a new field, or following an idea far enough to discover where it leads.",
         "Around that work, you can choose intensive courses taught by industry leaders, seek guidance from mentors, spend three months working inside a company, and go explore the world.",
@@ -74,7 +72,7 @@ export const DEFAULT_CONTENT: SiteContent = {
         "Maybe you were the person building something after school while everyone else was studying for the test.",
         "Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
         "You are curious. You take initiative. You want your work to matter.",
-        "And you want to spend the next two years around people who have the same intensity.",
+        "And you want to spend your life around people who have the same intensity.",
       ],
       cta: { label: "Learn about admissions", href: "#admissions" },
     },
@@ -96,7 +94,7 @@ export const DEFAULT_CONTENT: SiteContent = {
         src: "/life/sf.jpg",
         alt: "San Francisco and the Bay Bridge at dusk, seen from across the bay",
       },
-      heading: "Residential in San Francisco.",
+      heading: "Residence in San Francisco.",
       paragraphs: [
         "HAA is residential because the people around you matter as much as the material you study.",
         "You will live and work alongside a small cohort of unusually driven peers, in a city where some of the most consequential technology companies and research labs in the world are being built.",
