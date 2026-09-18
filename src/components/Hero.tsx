@@ -25,6 +25,12 @@ export default function Hero() {
     const copy = copyRef.current;
     if (!mark || !copy) return;
 
+    // On load the mark sweeps in from off-screen right and settles into its
+    // resting position; `intro` runs 1 -> 0 over that one play.
+    let intro = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? 0
+      : 1;
+
     let frame = 0;
     const apply = () => {
       frame = 0;
@@ -33,7 +39,8 @@ export default function Hero() {
 
       // The mark sweeps left and grows as it goes, as in the mock frames.
       const travel = mark.offsetWidth * 0.85;
-      mark.style.transform = `translate3d(${-p * travel}px,0,0) scale(${1 + p * 0.6})`;
+      const entrance = intro * window.innerWidth * 1.15;
+      mark.style.transform = `translate3d(${entrance - p * travel}px,0,0) scale(${1 + p * 0.6})`;
 
       // The copy fades out over the first half of the sweep.
       copy.style.opacity = `${Math.max(0, 1 - p / 0.5)}`;
@@ -43,10 +50,26 @@ export default function Hero() {
     };
 
     apply();
+
+    // Play that entrance once, then leave the mark to the scroll position.
+    const DURATION = 1400;
+    let introFrame = 0;
+    let start = 0;
+    const step = (now: number) => {
+      if (!start) start = now;
+      const t = Math.min((now - start) / DURATION, 1);
+      // easeOutCubic, running the entrance offset back down to zero
+      intro = Math.pow(1 - t, 3);
+      apply();
+      if (t < 1) introFrame = requestAnimationFrame(step);
+    };
+    if (intro) introFrame = requestAnimationFrame(step);
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      if (introFrame) cancelAnimationFrame(introFrame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
@@ -61,6 +84,8 @@ export default function Hero() {
         >
           <div
             ref={markRef}
+            // Starts off-screen right so the first paint matches the entrance.
+            style={{ transform: "translate3d(115vw,0,0)" }}
             className="absolute inset-y-0 right-0 w-[230vw] origin-[95%_50%] will-change-transform"
           >
             {BARS.map((bar) => (
