@@ -70,7 +70,7 @@ export default function Admissions() {
         />
       </div>
 
-      <div className="mt-[8vh] grid w-[min(1050px,88vw)] gap-x-10 gap-y-8 md:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="mt-[8vh] grid w-[min(1050px,88vw)] items-stretch gap-x-10 gap-y-8 md:grid-cols-[340px_minmax(0,1fr)]">
         <h2
           ref={headingRef}
           className="text-[clamp(2.25rem,4.2vw,4.5rem)] leading-[1.12] font-medium tracking-[-0.035em] opacity-0 will-change-[opacity]"
@@ -78,7 +78,7 @@ export default function Admissions() {
           For people who have never been good at waiting.
         </h2>
 
-        <div>
+        <div className="flex flex-col">
           <div
             ref={bodyRef}
             className="space-y-7 text-[clamp(1rem,1.2vw,1.25rem)] leading-[1.4] tracking-[-0.01em] opacity-0 will-change-[opacity]"
@@ -100,7 +100,10 @@ export default function Admissions() {
             </p>
           </div>
 
-          <div ref={ctaRef} className="mt-12 opacity-0 will-change-[opacity]">
+          <div
+            ref={ctaRef}
+            className="mt-12 md:mt-auto md:pt-12 opacity-0 will-change-[opacity]"
+          >
             <a
               href="#admissions"
               className="label inline-flex items-center gap-2 text-brand"

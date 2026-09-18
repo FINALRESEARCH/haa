@@ -24,11 +24,16 @@ export default function PeopleWall() {
     let timer: ReturnType<typeof setTimeout>;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        setHeadingIn(true);
-        // The line reads on its own first, then the wall arrives.
-        timer = setTimeout(() => setTilesIn(true), 900);
+        clearTimeout(timer);
+        if (entry.isIntersecting) {
+          setHeadingIn(true);
+          // The line reads on its own for a beat, then the wall arrives.
+          timer = setTimeout(() => setTilesIn(true), 1600);
+        } else {
+          // Scrolling back off takes the wall away again.
+          setHeadingIn(false);
+          setTilesIn(false);
+        }
       },
       { threshold: 0.6 },
     );

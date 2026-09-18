@@ -65,7 +65,7 @@ export default function Nav() {
     <header className="fixed inset-x-0 top-4 z-30 flex justify-center px-4">
       <nav
         ref={navRef}
-        className="w-full max-w-[880px] overflow-hidden rounded-2xl border border-black/[0.04] bg-[#EAEAEA]/75 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_12px_40px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl"
+        className="w-full max-w-[880px] overflow-hidden rounded-2xl border border-black/[0.04] bg-[#EAEAEA]/75 backdrop-blur-xl"
       >
         <div className="relative flex h-[52px] items-center justify-between px-3">
           <a
