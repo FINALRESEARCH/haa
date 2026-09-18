@@ -1,28 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Mark from "./Mark";
-import { sections } from "./sections";
+import { sections, type Section } from "./sections";
 
 export default function Nav() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  // The last panel stays mounted so it can collapse instead of vanishing.
+  const [panel, setPanel] = useState<Section | null>(null);
+
+  const show = useCallback((id: string | null) => {
+    setOpenId(id);
+    const next = sections.find((s) => s.id === id);
+    if (next) setPanel(next);
+  }, []);
 
   useEffect(() => {
     const syncHash = () => {
       const id = window.location.hash.slice(1);
-      if (sections.some((s) => s.id === id)) setOpenId(id);
+      if (sections.some((s) => s.id === id)) show(id);
     };
     syncHash();
     window.addEventListener("hashchange", syncHash);
     return () => window.removeEventListener("hashchange", syncHash);
-  }, []);
+  }, [show]);
 
   useEffect(() => {
     const onScroll = () => {
-      if (window.scrollY > 64) {
+      if (window.scrollY > window.innerHeight * 1.4) {
         setCollapsed(true);
         setOpenId(null);
       } else {
@@ -96,7 +104,7 @@ export default function Nav() {
                 key={section.id}
                 type="button"
                 onClick={() =>
-                  setOpenId((cur) => (cur === section.id ? null : section.id))
+                  show(openId === section.id ? null : section.id)
                 }
                 aria-expanded={openId === section.id}
                 className={`relative flex-1 py-3 transition-colors ${
@@ -115,30 +123,40 @@ export default function Nav() {
           </div>
         )}
 
-        {open && (
-          <>
+        <div
+          className={`grid transition-[grid-template-rows] duration-[350ms] ease-out ${
+            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          }`}
+        >
+          <div className="overflow-hidden">
             <Rule />
-            <div className="grid gap-8 p-7 md:grid-cols-[1fr_minmax(0,360px)]">
-              <div>
-                <h2 className="max-w-[22ch] text-[28px] font-medium leading-[1.08] tracking-[-0.02em]">
-                  {open.heading}
-                </h2>
-                <div className="mt-5 space-y-4 pl-1 text-[14px] leading-[1.55] text-foreground/85">
-                  {open.body.map((p) => (
-                    <p key={p.slice(0, 24)}>{p}</p>
-                  ))}
+            {panel && (
+              <div
+                className={`grid gap-8 p-7 transition-opacity duration-200 md:grid-cols-[1fr_minmax(0,360px)] ${
+                  open ? "opacity-100 delay-[250ms]" : "opacity-0"
+                }`}
+              >
+                <div>
+                  <h2 className="max-w-[22ch] text-[28px] font-medium leading-[1.08] tracking-[-0.02em]">
+                    {panel.heading}
+                  </h2>
+                  <div className="mt-5 space-y-4 pl-1 text-[14px] leading-[1.55] text-foreground/85">
+                    {panel.body.map((p) => (
+                      <p key={p.slice(0, 24)}>{p}</p>
+                    ))}
+                  </div>
+                  <a
+                    href={`#${panel.id}`}
+                    className="label mt-6 inline-flex items-center gap-2 pl-1 text-brand"
+                  >
+                    Read more <span aria-hidden>→</span>
+                  </a>
                 </div>
-                <a
-                  href={`#${open.id}`}
-                  className="label mt-6 inline-flex items-center gap-2 pl-1 text-brand"
-                >
-                  Read more <span aria-hidden>→</span>
-                </a>
+                <div className="min-h-[220px] rounded-md bg-[linear-gradient(135deg,#dcd9d4,#c9c5bf)]" />
               </div>
-              <div className="min-h-[220px] rounded-md bg-[linear-gradient(135deg,#dcd9d4,#c9c5bf)]" />
-            </div>
-          </>
-        )}
+            )}
+          </div>
+        </div>
       </nav>
     </header>
   );
