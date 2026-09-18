@@ -28,7 +28,7 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
     readMoreLabel
   },
   "home": *[_type == "homePage"][0]{
-    hero{ headline, body, cta },
+    hero{ layout, headline, body, cta },
     network{ heading, body, cta, portraits[]->${PERSON} },
     program{ heading, subheading, paragraphs, cta },
     admissions{ image, heading, paragraphs, cta },

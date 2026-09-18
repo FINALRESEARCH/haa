@@ -173,6 +173,7 @@ export function mergeContent(data: unknown): SiteContent {
 
     sections: {
       hero: {
+        layout: str(hero?.layout, fallback.sections.hero.layout),
         headline: str(hero?.headline, fallback.sections.hero.headline),
         body: str(hero?.body, fallback.sections.hero.body),
         cta: cta(hero?.cta, fallback.sections.hero.cta),
@@ -217,6 +218,9 @@ export function mergeContent(data: unknown): SiteContent {
           fallback.sections.people.paragraphs,
         ),
         tiles: portraits(peopleWall?.tiles, fallback.sections.people.tiles),
+        // The applicant tiles are local files cut by `scripts/encode-loops.mjs`,
+        // not Sanity assets, so the dataset has nothing to override here yet.
+        applicants: fallback.sections.people.applicants,
       },
       partners: {
         layout: str(partners?.layout, fallback.sections.partners.layout),

@@ -16,6 +16,20 @@ export const heroSection = defineType({
   type: "object",
   fields: [
     defineField({
+      name: "layout",
+      type: "string",
+      description:
+        "Which of the two hero layouts the page ships with. The ?hero= switcher still overrides this locally.",
+      options: {
+        list: [
+          { title: "Original (mark sweeps left on scroll)", value: "original" },
+          { title: "Marquee mark (mark loops rightward on its own)", value: "marquee" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "original",
+    }),
+    defineField({
       name: "headline",
       type: "text",
       rows: 3,
@@ -119,6 +133,7 @@ export const peopleWallSection = defineType({
         list: [
           { title: "Wall (pinned, heading inverted over the tiles)", value: "wall" },
           { title: "Stacked (heading and copy above the grid)", value: "stacked" },
+          { title: "Marquee (two video rows drifting around the copy)", value: "marquee" },
         ],
         layout: "radio",
       },
@@ -205,10 +220,11 @@ export const lifeSection = defineType({
         list: [
           { title: "Lock-up (plate rises, heading inverts)", value: "lockup" },
           { title: "Full-bleed plate", value: "bleed" },
+          { title: "Splat field (the plate as a particle cloud)", value: "splat" },
         ],
         layout: "radio",
       },
-      initialValue: "lockup",
+      initialValue: "splat",
     }),
     defineField({
       name: "image",

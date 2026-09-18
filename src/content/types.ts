@@ -21,7 +21,21 @@ export type PartnerLogo = {
 
 export type Picture = { src: string; alt: string };
 
+export type Applicant = {
+  name: string;
+  /** The line under the name: what they are working on, not a job title. */
+  pursuit: string;
+  /** The silent 4s tile excerpt, cut by `scripts/encode-loops.mjs`. */
+  loop: string;
+  /** Held until the excerpt decodes, and the whole tile under reduced motion. */
+  poster: string;
+  /** Mux playback id for the full interview. Empty until the master is uploaded. */
+  playbackId: string;
+};
+
 export type HeroContent = {
+  /** Matches a `Variant["id"]` in `src/components/hero/index.ts`. */
+  layout: string;
   headline: string;
   body: string;
   cta: Cta;
@@ -57,6 +71,8 @@ export type PeopleContent = {
   /** Only the layouts that put the wall in normal flow have room for these. */
   paragraphs: string[];
   tiles: Portrait[];
+  /** The marquee layout drifts these instead of `tiles`. */
+  applicants: Applicant[];
 };
 
 export type LifeContent = {

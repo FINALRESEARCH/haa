@@ -1,5 +1,6 @@
 import { sections as navSections } from "@/components/sections";
 import { PARTNER_LOGOS } from "@/data/partners";
+import { applicants } from "@/data/applicants";
 import { people } from "@/data/people";
 import type { SiteContent } from "./types";
 
@@ -38,6 +39,7 @@ export const DEFAULT_CONTENT: SiteContent = {
 
   sections: {
     hero: {
+      layout: "original",
       headline: "An academy for unusually ambitious young people.",
       body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
       cta: { label: "Apply to HAA", href: "#apply" },
@@ -86,10 +88,11 @@ export const DEFAULT_CONTENT: SiteContent = {
       ],
       // The wall is four across by two down, so it takes the first eight.
       tiles: people.slice(0, 8),
+      applicants,
     },
 
     life: {
-      layout: "lockup",
+      layout: "splat",
       image: {
         src: "/life/sf.jpg",
         alt: "San Francisco and the Bay Bridge at dusk, seen from across the bay",

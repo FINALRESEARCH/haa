@@ -1,0 +1,10 @@
+{
+  "//": "Source masters for the applicant marquee. `loopStart` is the second the silent 4s tile excerpt and its poster are both cut from — pick a moment with movement in it. `cropX` is the horizontal centre of the crop, 0-1, and only matters for landscape sources.",
+  "sourceDir": "/Users/e/Library/CloudStorage/SynologyDrive-FINAL/01 PROJECTS/FR_28_C_HAA/02 ASSETS/Applicant videos",
+  "applicants": [
+    { "slug": "diwen-huang",  "name": "Diwen Huang",  "file": "Diwen Huang_The Academy.m4v",  "loopStart": 15, "cropX": 0.5 },
+    { "slug": "elle-liemandt", "name": "Elle Liemandt", "file": "Elle Liemandt v2.m4v",        "loopStart": 15, "cropX": 0.5 },
+    { "slug": "idhant-ranjan", "name": "Idhant Ranjan", "file": "Idhant Ranjan_The Academy.m4v", "loopStart": 15, "cropX": 0.5 },
+    { "slug": "applicant-04",  "name": "Unnamed",      "file": "VID_20260917023256167.MP4",    "loopStart": 15, "cropX": 0.5 }
+  ]
+}
