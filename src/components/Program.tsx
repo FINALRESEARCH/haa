@@ -24,7 +24,7 @@ export default function Program() {
       const vh = window.innerHeight;
       for (const el of els) {
         const { top } = el.getBoundingClientRect();
-        el.style.opacity = `${clamp((vh * 0.9 - top) / (vh * 0.25))}`;
+        el.style.opacity = `${clamp((vh * 0.92 - top) / (vh * 0.12))}`;
       }
     };
     const onScroll = () => {
@@ -45,7 +45,7 @@ export default function Program() {
     <section
       ref={sectionRef}
       id="program"
-      className="relative flex flex-col items-center gap-20 bg-background px-6 pt-[22vh] pb-0"
+      className="relative flex flex-col items-center gap-16 bg-background px-6 pt-[6vh] pb-0"
     >
       <div
         data-reveal

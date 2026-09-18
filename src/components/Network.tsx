@@ -25,17 +25,22 @@ export default function Network() {
     let frame = 0;
     const apply = () => {
       frame = 0;
-      const distance = window.innerHeight * SECTION_SCROLL_VH;
-      const p = clamp(-wrap.getBoundingClientRect().top / distance);
+      const vh = window.innerHeight;
+      // 0 as the section's top meets the bottom of the screen, 0.5 once it is
+      // pinned, 1 a screen later.
+      const p = clamp(
+        (vh - wrap.getBoundingClientRect().top) /
+          (vh * (1 + SECTION_SCROLL_VH)),
+      );
 
       // Everything fades in place: nothing here travels with the scroll.
-      heading.style.opacity = `${clamp(p / 0.18)}`;
+      heading.style.opacity = `${clamp((p - 0.02) / 0.1)}`;
       // The grid grows from 75% in the middle of the screen...
-      const growth = clamp((p - 0.1) / 0.45);
+      const growth = clamp((p - 0.42) / 0.3);
       grid.style.transform = `scale(${0.75 + 0.25 * growth})`;
-      grid.style.opacity = `${clamp((p - 0.1) / 0.2)}`;
+      grid.style.opacity = `${clamp((p - 0.42) / 0.12)}`;
       // ...and only then does the supporting copy arrive.
-      copy.style.opacity = `${clamp((p - 0.6) / 0.25)}`;
+      copy.style.opacity = `${clamp((p - 0.62) / 0.08)}`;
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(apply);
@@ -55,6 +60,8 @@ export default function Network() {
     <div
       ref={wrapRef}
       id="faculty"
+      // Rides up a little into the tail of the hero so the two screens meet.
+      className="-mt-[25vh]"
       style={{ height: `${100 + SECTION_SCROLL_VH * 100}vh` }}
     >
       <section className="sticky top-0 flex h-screen flex-col items-center justify-center gap-8 overflow-hidden bg-background px-6 pt-[150px] pb-10">

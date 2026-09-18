@@ -27,14 +27,14 @@ export default function Admissions() {
       frame = 0;
       const vh = window.innerHeight;
       // 0 as the copy meets the bottom of the screen, 1 once it has risen.
-      const stage = (el: HTMLElement, from: number, over = 0.28) => {
+      const stage = (el: HTMLElement, from: number, over = 0.14) => {
         const { top } = el.getBoundingClientRect();
         const p = clamp((vh - top) / vh);
         el.style.opacity = `${clamp((p - from) / over)}`;
       };
       stage(heading, 0.05);
-      stage(body, 0.12);
-      stage(cta, 0.18);
+      stage(body, 0.1);
+      stage(cta, 0.12);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(apply);

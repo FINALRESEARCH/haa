@@ -8,6 +8,8 @@ import { sections, type Section } from "./sections";
 export default function Nav() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  // Phones start with the menu closed; the chevron is the only way in.
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   // The last panel stays mounted so it can collapse instead of vanishing.
   const [panel, setPanel] = useState<Section | null>(null);
@@ -66,8 +68,20 @@ export default function Nav() {
         className="w-full max-w-[880px] overflow-hidden rounded-2xl border border-black/[0.04] bg-[#EAEAEA]/75 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_12px_40px_-24px_rgba(0,0,0,0.35)] backdrop-blur-xl"
       >
         <div className="relative flex h-[52px] items-center justify-between px-3">
-          <a href="#top" className="flex items-center" aria-label="HAA home">
-            <Mark className="h-[22px] w-auto text-foreground" />
+          <a
+            href="#top"
+            className="flex items-center gap-2.5"
+            aria-label="HAA home"
+          >
+            <Image
+              src="/full-logo.svg"
+              alt="The Horowitz Andreessen Academy"
+              width={110}
+              height={27}
+              priority
+              className="h-[27px] w-auto sm:hidden"
+            />
+            <Mark className="hidden h-[22px] w-auto text-foreground sm:block" />
           </a>
           <Image
             src="/wordmark.svg"
@@ -87,29 +101,36 @@ export default function Nav() {
 
         <Rule />
 
-        {collapsed ? (
-          <button
-            type="button"
-            onClick={() => setCollapsed(false)}
-            aria-label="Expand menu"
-            aria-expanded={false}
-            className="flex w-full items-center justify-center py-1.5 text-foreground/50 transition-colors hover:text-foreground"
-          >
-            <Chevron className="h-3.5 w-3.5" />
-          </button>
-        ) : (
-          <div className="flex px-3 text-[13px]">
+        <button
+          type="button"
+          onClick={() => {
+            setCollapsed(false);
+            setMobileOpen(true);
+          }}
+          aria-label="Open menu"
+          aria-expanded={false}
+          className={`w-full items-center justify-center py-1.5 text-foreground/50 transition-colors hover:text-foreground ${
+            mobileOpen ? "hidden" : "flex"
+          } ${collapsed ? "sm:flex" : "sm:hidden"}`}
+        >
+          <Chevron className="h-3.5 w-3.5" />
+        </button>
+
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+            mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          } ${collapsed ? "sm:grid-rows-[0fr]" : "sm:grid-rows-[1fr]"}`}
+        >
+          <div className="flex flex-col overflow-hidden px-3 text-[13px] sm:flex-row">
             {sections.map((section, i) => (
               <button
                 key={section.id}
                 type="button"
-                onClick={() =>
-                  show(openId === section.id ? null : section.id)
-                }
+                onClick={() => show(openId === section.id ? null : section.id)}
                 aria-expanded={openId === section.id}
-                className={`relative flex-1 py-3 transition-colors ${
+                className={`relative flex-1 py-3.5 transition-colors sm:py-3 ${
                   i > 0
-                    ? "before:absolute before:inset-y-2 before:left-0 before:w-px before:bg-rule before:content-['']"
+                    ? "before:absolute before:inset-x-2 before:top-0 before:h-px before:bg-rule before:content-[''] sm:before:inset-x-auto sm:before:inset-y-2 sm:before:left-0 sm:before:h-auto sm:before:w-px"
                     : ""
                 } ${
                   openId === section.id
@@ -120,8 +141,20 @@ export default function Nav() {
                 {section.label}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMobileOpen(false);
+                show(null);
+              }}
+              aria-label="Close menu"
+              aria-expanded
+              className="-mx-3 mt-1 flex items-center justify-center py-1.5 text-foreground/50 sm:hidden"
+            >
+              <Chevron className="h-3.5 w-3.5 rotate-180" />
+            </button>
           </div>
-        )}
+        </div>
 
         <div
           className={`grid transition-[grid-template-rows] duration-[350ms] ease-out ${
