@@ -13,6 +13,10 @@ import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@sanity/client";
+import { ABOUT } from "../src/content/about.data.mjs";
+import { COURSES_PAGE } from "../src/content/courses.data.mjs";
+import { CURRICULUM } from "../src/content/curriculum.data.mjs";
+import { NAV_SECTIONS } from "../src/content/nav.data.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -71,19 +75,26 @@ async function assertExists(ids) {
 const keyed = (items) =>
   items.map((item, index) => ({ ...item, _key: `k${index}` }));
 
+/**
+ * `relationship` and `fields` drive the /network directory's two filters. The
+ * values here are placeholders, same as the ones in `src/data/network.ts`:
+ * plausible, not sourced, and meant to be replaced the moment the client's own
+ * database lands. The two unidentified portraits carry neither — they are not
+ * in the directory at all until they have a name.
+ */
 const PEOPLE = [
-  { slug: "sam-altman", name: "Sam Altman", affiliation: "OpenAI", file: "portrait-01.jpg" },
-  { slug: "jensen-huang", name: "Jensen Huang", affiliation: "NVIDIA", file: "portrait-02.jpg" },
-  { slug: "marc-andreessen", name: "Marc Andreessen", affiliation: "a16z", file: "portrait-03.jpg" },
-  { slug: "fei-fei-li", name: "Fei-Fei Li", affiliation: "Stanford", file: "portrait-04.jpg" },
-  { slug: "yuval-noah-harari", name: "Yuval Noah Harari", affiliation: "Author", file: "portrait-05.jpg" },
+  { slug: "sam-altman", name: "Sam Altman", affiliation: "OpenAI", file: "portrait-01.jpg", relationship: "guest-speaker", fields: ["ai", "startups"] },
+  { slug: "jensen-huang", name: "Jensen Huang", affiliation: "NVIDIA", file: "portrait-02.jpg", relationship: "guest-speaker", fields: ["ai", "engineering"] },
+  { slug: "marc-andreessen", name: "Marc Andreessen", affiliation: "a16z", file: "portrait-03.jpg", relationship: "founding-partner", fields: ["investing", "startups"] },
+  { slug: "fei-fei-li", name: "Fei-Fei Li", affiliation: "Stanford", file: "portrait-04.jpg", relationship: "faculty", fields: ["ai", "science"] },
+  { slug: "yuval-noah-harari", name: "Yuval Noah Harari", affiliation: "Author", file: "portrait-05.jpg", relationship: "guest-speaker", fields: ["writing"] },
   // TODO: the client has not identified these two portraits. They hold their
   // place in the grid and simply go uncaptioned until the names land.
   { slug: "portrait-06", name: "", affiliation: "", file: "portrait-06.jpg" },
-  { slug: "mark-zuckerberg", name: "Mark Zuckerberg", affiliation: "Meta", file: "portrait-07.jpg" },
-  { slug: "alex-karp", name: "Alex Karp", affiliation: "Palantir", file: "portrait-08.jpg" },
+  { slug: "mark-zuckerberg", name: "Mark Zuckerberg", affiliation: "Meta", file: "portrait-07.jpg", relationship: "guest-speaker", fields: ["startups", "leadership"] },
+  { slug: "alex-karp", name: "Alex Karp", affiliation: "Palantir", file: "portrait-08.jpg", relationship: "mentor", fields: ["startups", "ai"] },
   { slug: "portrait-09", name: "", affiliation: "", file: "portrait-09.jpg" },
-  { slug: "larry-page", name: "Larry Page", affiliation: "Google", file: "portrait-10.jpg" },
+  { slug: "larry-page", name: "Larry Page", affiliation: "Google", file: "portrait-10.jpg", relationship: "advisor", fields: ["engineering", "product"] },
 ];
 
 const PARTNERS = [
@@ -101,53 +112,6 @@ const PARTNERS = [
   { slug: "palantir", name: "Palantir", scale: 1 },
 ];
 
-const NAV = [
-  {
-    label: "Curriculum",
-    anchor: "curriculum",
-    heading: "Build your education around what you want to pursue.",
-    body: [
-      "At HAA, your own pursuits are at the center of your education.",
-      "You might start a company, build a new technology, conduct research, make art, write, master a new skill, read a book, or follow a question far enough to discover where it leads.",
-      "Courses, faculty, mentors, peers, companies, and the wider HAA network exist around that work: to challenge you, expand what you know, and help you go further.",
-    ],
-  },
-  {
-    label: "Network",
-    anchor: "network",
-    heading: "A network that keeps working after you leave.",
-    body: [
-      "Students work alongside founders, researchers, investors, and operators who take their projects seriously.",
-      "Introductions are made for the work, not for the résumé: the people you meet here are the people you build with next.",
-    ],
-  },
-  {
-    label: "Student Life",
-    anchor: "student-life",
-    heading: "A residential campus built for making things.",
-    body: [
-      "Everyone lives on campus, surrounded by people doing unreasonably ambitious work.",
-      "Studios, labs, and shops stay open late, and the day is structured around the work rather than around the timetable.",
-    ],
-  },
-  {
-    label: "Admissions",
-    anchor: "admissions",
-    heading: "We read for evidence, not credentials.",
-    body: [
-      "Applications open once a year. We look for what you have already made, questioned, or taught yourself.",
-      "There is no test score and no minimum age. Show us the work and tell us where you intend to take it.",
-    ],
-  },
-  {
-    label: "About",
-    anchor: "about",
-    heading: "A residential academy in San Francisco.",
-    body: [
-      "The Horowitz Andreessen Academy exists for students who would rather spend their time making, investigating, and experimenting than preparing for a life that starts later.",
-    ],
-  },
-];
 
 const MARK_PATH =
   "M19.0845 26.449H11.0349V0H19.0845V26.449ZM38.1449 26.449H30.0953L22.7519 0H30.8013L38.1449 26.449ZM52.5017 26.449H44.4521L37.1087 0H45.1583L52.5017 26.449ZM7.4751 16.9619H0V9.48684H7.4751V16.9619Z";
@@ -166,6 +130,8 @@ async function main() {
       name: person.name,
       affiliation: person.affiliation,
       portrait,
+      ...(person.relationship ? { relationship: person.relationship } : {}),
+      ...(person.fields ? { fields: person.fields } : {}),
     });
     people.push(_id);
   }
@@ -220,10 +186,10 @@ async function main() {
     _id: "navigation",
     _type: "navigation",
     items: keyed(
-      NAV.map((item) => ({
+      NAV_SECTIONS.map((item) => ({
         _type: "navPanel",
         label: item.label,
-        anchor: item.anchor,
+        anchor: item.id,
         heading: item.heading,
         body: item.body,
         readMoreLabel: "Read more",
@@ -325,6 +291,75 @@ async function main() {
     },
   });
   console.log("  homePage");
+
+  await client.createIfNotExists({
+    _id: "aboutPage",
+    _type: "aboutPage",
+    layout: ABOUT.layout,
+    eyebrow: ABOUT.eyebrow,
+    heading: ABOUT.heading,
+    opening: ABOUT.opening,
+    chapters: keyed(
+      ABOUT.chapters.map((chapter) => ({
+        _type: "aboutChapter",
+        heading: chapter.heading,
+        paragraphs: chapter.paragraphs,
+        links: keyed(chapter.links.map((link) => ({ _type: "cta", ...link }))),
+      })),
+    ),
+    applyLabel: ABOUT.closing.applyLabel,
+    links: keyed(ABOUT.closing.links.map((link) => ({ _type: "cta", ...link }))),
+  });
+  console.log("  aboutPage");
+
+  await client.createIfNotExists({
+    _id: "curriculumPage",
+    _type: "curriculumPage",
+    eyebrow: CURRICULUM.eyebrow,
+    heading: CURRICULUM.heading,
+    opening: CURRICULUM.opening,
+    chapters: keyed(
+      CURRICULUM.chapters.map((chapter) => ({
+        _type: "curriculumChapter",
+        heading: chapter.heading,
+        lede: chapter.lede,
+        paragraphs: chapter.paragraphs,
+        points: keyed(
+          chapter.points.map((point) => ({
+            _type: "curriculumPoint",
+            heading: point.heading,
+            paragraphs: point.paragraphs,
+            features: point.features,
+          })),
+        ),
+        features: chapter.features,
+        links: keyed(chapter.links.map((link) => ({ _type: "cta", ...link }))),
+      })),
+    ),
+    pursuits: CURRICULUM.pursuits,
+    week: keyed(
+      CURRICULUM.week.map((day) => ({
+        _type: "curriculumDay",
+        day: day.day,
+        entries: keyed(
+          day.entries.map((entry) => ({ _type: "curriculumEntry", ...entry })),
+        ),
+      })),
+    ),
+    closingHeading: CURRICULUM.closing.heading,
+    applyLabel: CURRICULUM.closing.applyLabel,
+  });
+  console.log("  curriculumPage");
+
+  await client.createIfNotExists({
+    _id: "coursesPage",
+    _type: "coursesPage",
+    ...COURSES_PAGE,
+  });
+  console.log("  coursesPage");
+
+  // The catalogue itself is not seeded: it is an Airtable base, so it comes
+  // in through `npm run courses:import` the way the network does.
 
   console.log("\nDone. Open /studio to edit.");
 }

@@ -3,6 +3,15 @@ import { cache } from "react";
 import { DEFAULT_CONTENT } from "@/content/defaults";
 import { placeholderVideo } from "@/data/people";
 import type {
+  AboutChapter,
+  AboutContent,
+  CurriculumChapter,
+  CurriculumContent,
+  CoursesPageContent,
+  CurriculumDay,
+  CurriculumEntry,
+  CurriculumFeature,
+  CurriculumPoint,
   Cta,
   MuxVideo,
   NavPanel,
@@ -25,13 +34,13 @@ const OG_IMAGE_WIDTH = 1200;
 
 type Raw = Record<string, unknown> | null | undefined;
 
-const obj = (value: unknown): Raw =>
+export const obj = (value: unknown): Raw =>
   typeof value === "object" && value !== null && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
 
 /** Empty and missing are the same thing here: fall back to the default. */
-function str(value: unknown, fallback: string): string {
+export function str(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() !== "" ? value : fallback;
 }
 
@@ -178,6 +187,124 @@ function logos(value: unknown, fallback: PartnerLogo[]): PartnerLogo[] {
   return kept.length ? kept : fallback;
 }
 
+function chapters(value: unknown, fallback: AboutChapter[]): AboutChapter[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: AboutChapter[] = [];
+  for (const entry of value) {
+    const raw = obj(entry);
+    const heading = str(raw?.heading, "");
+    const body = paragraphs(raw?.paragraphs, []);
+    // A chapter with no heading or nothing to say is mid-edit, not content.
+    if (!heading || !body.length) continue;
+    kept.push({ heading, paragraphs: body, links: ctas(raw?.links, []) });
+  }
+  return kept.length ? kept : fallback;
+}
+
+/** Plain strings, for the pursuit list and a week row's entries. */
+function strings(value: unknown, fallback: string[]): string[] {
+  return paragraphs(value, fallback);
+}
+
+const FEATURES: CurriculumFeature[] = [
+  "pursuits",
+  "courses",
+  "speakers",
+  "partners",
+  "week",
+  "mentors",
+];
+
+/**
+ * The page can only draw the blocks it has renderers for, and an editor can
+ * leave a value behind in the dataset after one is renamed. Anything unknown
+ * is dropped here rather than reaching the page as a gap in the layout.
+ */
+function features(value: unknown): CurriculumFeature[] {
+  if (!Array.isArray(value)) return [];
+  const kept = value.filter((entry): entry is CurriculumFeature =>
+    FEATURES.includes(entry as CurriculumFeature),
+  );
+  return [...new Set(kept)];
+}
+
+function points(value: unknown, fallback: CurriculumPoint[]): CurriculumPoint[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: CurriculumPoint[] = [];
+  for (const entry of value) {
+    const raw = obj(entry);
+    const heading = str(raw?.heading, "");
+    const body = paragraphs(raw?.paragraphs, []);
+    if (!heading || !body.length) continue;
+    kept.push({ heading, paragraphs: body, features: features(raw?.features) });
+  }
+  return kept.length ? kept : fallback;
+}
+
+/**
+ * Looser than `chapters` above: a curriculum chapter may carry its argument
+ * entirely in its points — "Take your education into the world." does — so
+ * having no paragraphs of its own is content, not a half-filled entry.
+ */
+function curriculumChapters(
+  value: unknown,
+  fallback: CurriculumChapter[],
+): CurriculumChapter[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: CurriculumChapter[] = [];
+  for (const entry of value) {
+    const raw = obj(entry);
+    const heading = str(raw?.heading, "");
+    if (!heading) continue;
+    kept.push({
+      heading,
+      lede: str(raw?.lede, ""),
+      paragraphs: paragraphs(raw?.paragraphs, []),
+      points: points(raw?.points, []),
+      features: features(raw?.features),
+      links: ctas(raw?.links, []),
+    });
+  }
+  return kept.length ? kept : fallback;
+}
+
+/**
+ * A day's blocks. A plain string is still read as one: the field held bare
+ * labels before the calendar needed heights, and a dataset seeded then would
+ * otherwise render the week as five empty columns.
+ */
+function entries(value: unknown): CurriculumEntry[] {
+  if (!Array.isArray(value)) return [];
+  const kept: CurriculumEntry[] = [];
+  for (const entry of value) {
+    if (typeof entry === "string") {
+      if (entry.trim()) kept.push({ label: entry, span: 1 });
+      continue;
+    }
+    const raw = obj(entry);
+    const label = str(raw?.label, "");
+    if (!label) continue;
+    const span = raw?.span;
+    kept.push({
+      label,
+      span: typeof span === "number" && span > 0 ? span : 1,
+    });
+  }
+  return kept;
+}
+
+function week(value: unknown, fallback: CurriculumDay[]): CurriculumDay[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: CurriculumDay[] = [];
+  for (const entry of value) {
+    const raw = obj(entry);
+    const day = str(raw?.day, "");
+    if (!day) continue;
+    kept.push({ day, entries: entries(raw?.entries) });
+  }
+  return kept.length ? kept : fallback;
+}
+
 function navPanels(value: unknown, fallback: NavPanel[]): NavPanel[] {
   if (!Array.isArray(value)) return fallback;
   const kept: NavPanel[] = [];
@@ -212,6 +339,7 @@ export function mergeContent(data: unknown): SiteContent {
   const partners = obj(home?.partners);
   const life = obj(home?.life);
   const closing = obj(home?.closing);
+  const about = obj(root?.about);
 
   return {
     settings: {
@@ -333,6 +461,77 @@ export function mergeContent(data: unknown): SiteContent {
         ),
       },
     },
+
+    about: aboutPage(about, settings, fallback),
+    curriculum: curriculumPage(obj(root?.curriculum), settings, fallback),
+    courses: coursesPage(obj(root?.courses), fallback),
+  };
+}
+
+/** The /about manifesto, laid over its defaults the same way. */
+function aboutPage(
+  about: Raw,
+  settings: Raw,
+  fallback: SiteContent,
+): AboutContent {
+  return {
+    layout: str(about?.layout, fallback.about.layout),
+    eyebrow: str(about?.eyebrow, fallback.about.eyebrow),
+    heading: str(about?.heading, fallback.about.heading),
+    opening: paragraphs(about?.opening, fallback.about.opening),
+    chapters: chapters(about?.chapters, fallback.about.chapters),
+    closing: {
+      // Same rule as the home page's closing section: the label is the page's,
+      // the destination is the site's one apply link.
+      apply: {
+        label: str(about?.applyLabel, fallback.about.closing.apply.label),
+        href: cta(settings?.applyCta, fallback.settings.applyCta).href,
+      },
+      links: ctas(about?.links, fallback.about.closing.links),
+    },
+  };
+}
+
+/** /curriculum, laid over its defaults the same way. */
+function curriculumPage(
+  curriculum: Raw,
+  settings: Raw,
+  fallback: SiteContent,
+): CurriculumContent {
+  return {
+    eyebrow: str(curriculum?.eyebrow, fallback.curriculum.eyebrow),
+    heading: str(curriculum?.heading, fallback.curriculum.heading),
+    opening: paragraphs(curriculum?.opening, fallback.curriculum.opening),
+    chapters: curriculumChapters(
+      curriculum?.chapters,
+      fallback.curriculum.chapters,
+    ),
+    pursuits: strings(curriculum?.pursuits, fallback.curriculum.pursuits),
+    week: week(curriculum?.week, fallback.curriculum.week),
+    closing: {
+      heading: str(
+        curriculum?.closingHeading,
+        fallback.curriculum.closing.heading,
+      ),
+      // Same rule as /about: the label is the page's, the destination is the
+      // site's one apply link.
+      apply: {
+        label: str(
+          curriculum?.applyLabel,
+          fallback.curriculum.closing.apply.label,
+        ),
+        href: cta(settings?.applyCta, fallback.settings.applyCta).href,
+      },
+    },
+  };
+}
+
+/** The copy at the top of /courses. Its rows come from `getCourses`. */
+function coursesPage(courses: Raw, fallback: SiteContent): CoursesPageContent {
+  return {
+    eyebrow: str(courses?.eyebrow, fallback.courses.eyebrow),
+    heading: str(courses?.heading, fallback.courses.heading),
+    intro: paragraphs(courses?.intro, fallback.courses.intro),
   };
 }
 

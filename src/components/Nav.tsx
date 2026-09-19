@@ -21,6 +21,17 @@ const SCROLL_DELTA_PX = 4;
  */
 const panelHref = (id: string) => `/${id}`;
 
+/**
+ * Routes that open with the bar already in its collapsed, chevron-only form.
+ *
+ * A directory is a page you came to use rather than read, so the section row
+ * has nothing to offer it and every pixel of it is over the table. It also
+ * isn't much taller than the screen, so the long scroll that would normally
+ * collapse the bar never happens. The chevron and the card's bottom strip
+ * still open it, the same as anywhere else.
+ */
+const COMPACT_ROUTES = new Set(["/network"]);
+
 type Props = {
   panels: NavPanel[];
   settings: SiteSettings;
@@ -182,8 +193,10 @@ export default function Nav({ panels, settings }: Props) {
     href.startsWith("#") && pathname !== "/" ? `/${href}` : href;
 
   const open = panels.find((p) => p.id === openId) ?? null;
-  // Hover and pinning both hold the card open against the scroll state.
-  const barCollapsed = collapsed && !hoverExpanded && !pinnedId;
+  // Hover and pinning both hold the card open, against the scroll state and
+  // against a route that asked for it collapsed alike.
+  const barCollapsed =
+    (collapsed || COMPACT_ROUTES.has(pathname)) && !hoverExpanded && !pinnedId;
 
   return (
     <header className="fixed inset-x-0 top-4 z-30 flex justify-center px-4">
@@ -276,31 +289,51 @@ export default function Nav({ panels, settings }: Props) {
           } ${barCollapsed ? "sm:grid-rows-[0fr]" : "sm:grid-rows-[1fr]"}`}
         >
           <div className="flex flex-col overflow-hidden px-3 text-[13px] sm:flex-row">
-            {panels.map((section, i) => (
-              <Link
-                key={section.id}
-                href={panelHref(section.id)}
-                onClick={(e) => onSectionClick(e, section.id)}
-                onNavigate={closeMenu}
-                onPointerEnter={(e) => hoverSection(e, section.id)}
-                onPointerLeave={(e) => {
-                  if (isMouse(e)) clearDwell();
-                }}
-                onFocus={() => show(section.id)}
-                aria-expanded={openId === section.id}
-                className={`relative flex-1 py-3.5 text-center transition-colors sm:py-3 ${
-                  i > 0
-                    ? "before:absolute before:inset-x-2 before:top-0 before:h-px before:bg-rule before:content-[''] sm:before:inset-x-auto sm:before:inset-y-2 sm:before:left-0 sm:before:h-auto sm:before:w-px"
-                    : ""
-                } ${
-                  openId === section.id
-                    ? "bg-black/[0.06]"
-                    : "hover:bg-black/[0.03]"
-                }`}
-              >
-                {section.label}
-              </Link>
-            ))}
+            {panels.map((section, i) => {
+              // The section you are already reading. It stays in the row —
+              // taking it out would shuffle the others sideways on every
+              // navigation — but it is greyed back and inert: a link to here
+              // is the one link in the row that cannot tell you anything.
+              const here = pathname === panelHref(section.id);
+              const rule =
+                i > 0
+                  ? "before:absolute before:inset-x-2 before:top-0 before:h-px before:bg-rule before:content-[''] sm:before:inset-x-auto sm:before:inset-y-2 sm:before:left-0 sm:before:h-auto sm:before:w-px"
+                  : "";
+
+              if (here) {
+                return (
+                  <span
+                    key={section.id}
+                    aria-current="page"
+                    className={`relative flex-1 cursor-default py-3.5 text-center text-foreground/35 sm:py-3 ${rule}`}
+                  >
+                    {section.label}
+                  </span>
+                );
+              }
+
+              return (
+                <Link
+                  key={section.id}
+                  href={panelHref(section.id)}
+                  onClick={(e) => onSectionClick(e, section.id)}
+                  onNavigate={closeMenu}
+                  onPointerEnter={(e) => hoverSection(e, section.id)}
+                  onPointerLeave={(e) => {
+                    if (isMouse(e)) clearDwell();
+                  }}
+                  onFocus={() => show(section.id)}
+                  aria-expanded={openId === section.id}
+                  className={`relative flex-1 py-3.5 text-center transition-colors sm:py-3 ${rule} ${
+                    openId === section.id
+                      ? "bg-black/[0.06]"
+                      : "hover:bg-black/[0.03]"
+                  }`}
+                >
+                  {section.label}
+                </Link>
+              );
+            })}
             <button
               type="button"
               onClick={() => {

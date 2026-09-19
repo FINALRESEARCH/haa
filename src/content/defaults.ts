@@ -1,8 +1,11 @@
 import { sections as navSections } from "@/components/sections";
+import { ABOUT } from "./about.data.mjs";
+import { COURSES_PAGE } from "./courses.data.mjs";
+import { CURRICULUM } from "./curriculum.data.mjs";
 import { PARTNER_LOGOS } from "@/data/partners";
 import { applicants } from "@/data/applicants";
 import { people } from "@/data/people";
-import type { SiteContent } from "./types";
+import type { CurriculumChapter, SiteContent } from "./types";
 
 const MARK_PATH =
   "M19.0845 26.449H11.0349V0H19.0845V26.449ZM38.1449 26.449H30.0953L22.7519 0H30.8013L38.1449 26.449ZM52.5017 26.449H44.4521L37.1087 0H45.1583L52.5017 26.449ZM7.4751 16.9619H0V9.48684H7.4751V16.9619Z";
@@ -137,4 +140,36 @@ export const DEFAULT_CONTENT: SiteContent = {
       logos: PARTNER_LOGOS,
     },
   },
+
+  about: {
+    layout: ABOUT.layout,
+    eyebrow: ABOUT.eyebrow,
+    heading: ABOUT.heading,
+    opening: ABOUT.opening,
+    chapters: ABOUT.chapters,
+    closing: {
+      // Href filled from `settings.applyCta` by the mapper, same as `closing`.
+      apply: { label: ABOUT.closing.applyLabel, href: "#apply" },
+      links: ABOUT.closing.links,
+    },
+  },
+
+  curriculum: {
+    eyebrow: CURRICULUM.eyebrow,
+    heading: CURRICULUM.heading,
+    opening: CURRICULUM.opening,
+    // The `.mjs` file has no types to narrow `features` with, so the cast is
+    // where the two meet. `src/sanity/content.ts` drops anything the page has
+    // no renderer for, which is what actually keeps a bad value off the page.
+    chapters: CURRICULUM.chapters as CurriculumChapter[],
+    pursuits: CURRICULUM.pursuits,
+    week: CURRICULUM.week,
+    closing: {
+      heading: CURRICULUM.closing.heading,
+      // Href filled from `settings.applyCta` by the mapper, same as `about`.
+      apply: { label: CURRICULUM.closing.applyLabel, href: "#apply" },
+    },
+  },
+
+  courses: COURSES_PAGE,
 };

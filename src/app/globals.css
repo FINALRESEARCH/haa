@@ -6,6 +6,14 @@
   --brand: #fe3619;
   --panel: #efeeec;
   --rule: rgba(0, 0, 0, 0.04);
+  /*
+   * The directory's marked row. Opaque rather than a translucent wash of
+   * `--foreground`, because the two columns that stay put while the table
+   * scrolls sideways have to paint the same colour as the row they belong to
+   * while also hiding the columns sliding underneath them — and a wash hides
+   * nothing.
+   */
+  --row: color-mix(in srgb, var(--foreground) 5.5%, var(--background));
 }
 
 @theme inline {
@@ -13,6 +21,7 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-panel: var(--panel);
+  --color-row: var(--row);
   --color-rule: var(--rule);
   --font-sans: var(--font-nudge);
   --font-mono: var(--font-px-mono);

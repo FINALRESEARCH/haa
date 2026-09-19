@@ -129,6 +129,126 @@ export type ClosingContent = {
   markPath: string;
 };
 
+/** One numbered movement of the /about manifesto. */
+export type AboutChapter = {
+  heading: string;
+  paragraphs: string[];
+  /** Usually empty: only a couple of chapters send you somewhere. */
+  links: Cta[];
+};
+
+/** The /about page. Its own document, not a slice of the home page. */
+export type AboutContent = {
+  /** Matches an `AboutVariant["id"]` in `src/components/about/index.ts`. */
+  layout: string;
+  /** The mono line above the opening statement. */
+  eyebrow: string;
+  heading: string;
+  /** The opening statement, set larger than the chapters that follow. */
+  opening: string[];
+  chapters: AboutChapter[];
+  closing: {
+    /**
+     * The primary button, composed in `src/sanity/content.ts` from this label
+     * and `settings.applyCta.href` — the same trick the closing section uses.
+     */
+    apply: Cta;
+    links: Cta[];
+  };
+};
+
+/**
+ * The blocks a curriculum chapter can print after its type. A value the page
+ * has no renderer for is dropped rather than rendered as a hole — see
+ * `src/components/curriculum/features.tsx`.
+ */
+export type CurriculumFeature =
+  | "pursuits"
+  | "courses"
+  | "speakers"
+  | "partners"
+  | "week"
+  | "mentors";
+
+/** A bolded sub-argument inside a chapter, with its own optional blocks. */
+export type CurriculumPoint = {
+  heading: string;
+  paragraphs: string[];
+  features: CurriculumFeature[];
+};
+
+/** One movement of the /curriculum page. */
+export type CurriculumChapter = {
+  heading: string;
+  /** The single line under the heading, set larger than the paragraphs. */
+  lede: string;
+  paragraphs: string[];
+  points: CurriculumPoint[];
+  features: CurriculumFeature[];
+  links: Cta[];
+};
+
+/**
+ * A row of the course directory, as the client's Airtable base defines it —
+ * see `src/data/courses.ts`. Both the /courses directory and /curriculum's
+ * featured grid render this, so the cards on the curriculum page can never
+ * disagree with the catalogue about what a course is called.
+ */
+export type Course = {
+  /** The Sanity `_id`, or the slugged title in the fallback data. */
+  id: string;
+  title: string;
+  /**
+   * `course` or `track` — the base's own distinction and the directory's only
+   * filter. A course is taught by named instructors; a track is a themed
+   * series with a guest-speaker lineup.
+   */
+  type: string;
+  description: string;
+  /** The instructors of a course, or a track's speaker lineup. */
+  people: string[];
+  /** The instructors' titles. Empty on every track: the base has no such column. */
+  affiliation: string;
+  /** Printed on /curriculum's featured grid. Set in the Studio, not Airtable. */
+  featured: boolean;
+};
+
+/** The copy at the top of /courses. The rows come from `Course`. */
+export type CoursesPageContent = {
+  eyebrow: string;
+  heading: string;
+  intro: string[];
+};
+
+/**
+ * One block in a day column of the "no typical week" calendar. `span` is its
+ * share of the column's height, not a number of hours — the page draws the
+ * shape of a week without claiming a timetable the school hasn't set.
+ */
+export type CurriculumEntry = { label: string; span: number };
+
+/** One day column of the "no typical week" calendar. */
+export type CurriculumDay = { day: string; entries: CurriculumEntry[] };
+
+/** The /curriculum page. Its own document, like /about. */
+export type CurriculumContent = {
+  /** The mono line above the heading. */
+  eyebrow: string;
+  heading: string;
+  opening: string[];
+  chapters: CurriculumChapter[];
+  pursuits: string[];
+  week: CurriculumDay[];
+  closing: {
+    heading: string;
+    /**
+     * Composed in `src/sanity/content.ts` from this page's label and
+     * `settings.applyCta.href`, the same as /about's.
+     */
+    apply: Cta;
+  };
+};
+
 /** Keyed by `SectionDef["key"]`, which is also the `?hero=2` URL param. */
 export type SectionContent = {
   hero: HeroContent;
@@ -184,4 +304,38 @@ export type SiteContent = {
   settings: SiteSettings;
   nav: NavPanel[];
   sections: SectionContent;
+  about: AboutContent;
+  curriculum: CurriculumContent;
+  courses: CoursesPageContent;
+};
+
+/**
+ * A `person` document as the /network directory needs it: the portrait plus
+ * the two things the directory is filtered and linked by. The homepage grid
+ * reads the same documents through `Portrait` and ignores all of this.
+ */
+export type NetworkPerson = {
+  /** The Sanity `_id`, or a slug in the fallback data. */
+  id: string;
+  /**
+   * The portrait, at the size the pinned panel draws it. Undefined is the
+   * common case, not an edge one: Airtable has no photo column, so a row has
+   * a picture only once someone has uploaded one in the Studio. The directory
+   * draws a monogram for the rest.
+   */
+  src?: string;
+  /** The same portrait at row-thumbnail size. */
+  thumb?: string;
+  name: string;
+  /** The line under the name: "OpenAI", not a sentence. */
+  affiliation: string;
+  /**
+   * `RELATIONSHIPS` values. Several is normal — a firm is often both a
+   * founding and a hiring partner — and empty is possible mid-edit.
+   */
+  relationships: string[];
+  /** `FIELDS` values. Empty is normal. */
+  fields: string[];
+  /** Where the name links. Empty prints the name unlinked. */
+  profileUrl: string;
 };

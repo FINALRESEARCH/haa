@@ -17,12 +17,22 @@ type Props = {
   selection: Selection;
   /** What Sanity publishes. Picks matching these stay out of the URL. */
   defaults: Selection;
+  /**
+   * The route the picks are written back to. The home page owns the section
+   * registry, but a standalone page like /about has variants of its own, so
+   * the switcher has to be told where it is.
+   */
+  basePath?: string;
+  /** Per-route, so one page's picks never leak into another's URL. */
+  storageKey?: string;
 };
 
 export default function VariantSwitcher({
   sections,
   selection,
   defaults,
+  basePath = "/",
+  storageKey = STORAGE_KEY,
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -31,18 +41,19 @@ export default function VariantSwitcher({
   // A bare URL falls back to the last combo picked on this machine.
   useEffect(() => {
     if (window.location.search) return;
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(storageKey);
     if (!saved) return;
     try {
       const params = selectionToParams(
         JSON.parse(saved) as Selection,
         defaults,
       );
-      if (params.toString()) router.replace(`/?${params}`, { scroll: false });
+      if (params.toString())
+        router.replace(`${basePath}?${params}`, { scroll: false });
     } catch {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, [router, defaults]);
+  }, [router, defaults, basePath, storageKey]);
 
   // Scroll to the section only once its new variant has actually mounted.
   useEffect(() => {
@@ -55,15 +66,17 @@ export default function VariantSwitcher({
   const choose = (section: SwitcherSection, index: number) => {
     if (selection[section.key] === index) return;
     const next = { ...selection, [section.key]: index };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(storageKey, JSON.stringify(next));
     pendingScroll.current = section.anchorId;
     const params = selectionToParams(next, defaults);
-    router.replace(params.toString() ? `/?${params}` : "/", { scroll: false });
+    router.replace(params.toString() ? `${basePath}?${params}` : basePath, {
+      scroll: false,
+    });
   };
 
   const reset = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    router.replace("/", { scroll: false });
+    localStorage.removeItem(storageKey);
+    router.replace(basePath, { scroll: false });
   };
 
   const active = sections.filter(
