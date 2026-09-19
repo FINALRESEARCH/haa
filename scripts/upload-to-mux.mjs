@@ -83,6 +83,11 @@ for (const { slug, name, file, loopStart } of queue) {
       new_asset_settings: {
         playback_policies: ["public"],
         video_quality: "plus",
+        // The site plays mp4s, never HLS — `muxVideo()` in
+        // `src/sanity/content.ts` builds its URL out of these. Without one the
+        // applicant's tile has no modal to open. `scripts/mux-static-renditions.mjs`
+        // backfills assets that were uploaded before this was here.
+        static_renditions: [{ resolution: "highest" }],
         passthrough: assetDocId,
       },
     }),

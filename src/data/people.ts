@@ -26,24 +26,24 @@ export const placeholderVideo = (i: number): MuxVideo => {
   };
 };
 
-const speaker = (n: number, name: string, affiliation: string): Portrait => ({
+const speaker = (n: number, name: string, title: string): Portrait => ({
   src: portrait(n),
   name,
-  affiliation,
+  affiliation: title,
   video: placeholderVideo(n),
 });
 
 export const people: Portrait[] = [
-  speaker(1, "Sam Altman", "OpenAI"),
-  speaker(2, "Jensen Huang", "NVIDIA"),
-  speaker(3, "Marc Andreessen", "a16z"),
-  speaker(4, "Fei-Fei Li", "Stanford"),
-  speaker(5, "Yuval Noah Harari", "Author"),
+  speaker(1, "Sam Altman", "Founder of OpenAI"),
+  speaker(2, "Jensen Huang", "CEO of NVIDIA"),
+  speaker(3, "Marc Andreessen", "Co-founder of a16z"),
+  speaker(4, "Fei-Fei Li", "Professor at Stanford"),
+  speaker(5, "Yuval Noah Harari", "Author of Sapiens"),
   // TODO: the client has not identified these two portraits. They hold their
   // place in the grid and simply go uncaptioned until the names land.
   speaker(6, "", ""),
-  speaker(7, "Mark Zuckerberg", "Meta"),
-  speaker(8, "Alex Karp", "Palantir"),
+  speaker(7, "Mark Zuckerberg", "Founder of Meta"),
+  speaker(8, "Alex Karp", "CEO of Palantir"),
   speaker(9, "", ""),
-  speaker(10, "Larry Page", "Google"),
+  speaker(10, "Larry Page", "Co-founder of Google"),
 ];

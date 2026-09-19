@@ -102,15 +102,18 @@ function Tile({ person, index }: { person: Portrait; index: number }) {
         )}
       </div>
 
-      {/* Tight to the tile on purpose: the chip reads as the tile's label, not
-          as a caption floating under it. The two portraits the client has not
-          identified yet still take their place in the grid — they just go
-          uncaptioned rather than carrying an empty chip. */}
+      {/* Name and title share the one bubble, tight to the tile so it labels
+          it rather than floats under it. The two portraits the client has not
+          identified yet still take their place in the grid — they simply go
+          unlabelled.
+
+          Sizing lives in `.label`, not here: it is unlayered, so a Tailwind
+          text utility on this would lose the cascade and read as a lie. */}
       {person.name && (
-        <div className="label mt-1.5 inline-flex flex-col gap-0.5 rounded-[5px] bg-[#EAEAEA] px-2.5 py-1.5 text-[10px] tracking-[0.06em] text-foreground">
+        <div className="label mt-1.5 inline-flex flex-col gap-0.5 rounded-[5px] bg-[#EAEAEA] px-2.5 py-1.5 text-foreground">
           <span>{person.name}</span>
           {person.affiliation && (
-            <span className="opacity-60">{person.affiliation}</span>
+            <span className="opacity-55">{person.affiliation}</span>
           )}
         </div>
       )}
@@ -154,13 +157,16 @@ export default function NetworkV2({ id, content }: VariantProps<"network">) {
       // Rides up a little into the tail of the hero so the two screens meet.
       className="-mt-[25vh] bg-background px-6 pt-[150px] pb-[14vh]"
     >
-      <h2 className="mx-auto w-[min(1100px,92vw)] text-center text-[clamp(1.75rem,3.6vw,3.5rem)] font-medium leading-[1.02] tracking-[-0.035em]">
+      <h2 className="mx-auto w-full max-w-[1100px] text-center text-[clamp(1.75rem,3.6vw,3.5rem)] font-medium leading-[1.02] tracking-[-0.035em]">
         {content.heading}
       </h2>
 
       {/* Near full-bleed on purpose. Five across is width-capped by the
-          viewport, so the only room left for "bigger" is the margin. */}
-      <ul className="mx-auto mt-[7vh] grid w-[min(1800px,96vw)] grid-cols-2 gap-x-2 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
+          viewport, so the only room left for "bigger" is the margin — which
+          the section's own `px-6` already provides. Sizing this in `vw` on top
+          of that padding pushed the grid past the viewport on narrow screens
+          and gave the page a horizontal scrollbar. */}
+      <ul className="mx-auto mt-[7vh] grid w-full max-w-[1800px] grid-cols-2 gap-x-2 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
         {content.portraits.map((person, i) => (
           <Tile key={person.src} person={person} index={i} />
         ))}

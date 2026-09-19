@@ -28,7 +28,7 @@ export const heroSection = defineType({
         ],
         layout: "radio",
       },
-      initialValue: "original",
+      initialValue: "video",
     }),
     defineField({
       name: "headline",
@@ -106,80 +106,60 @@ export const programSection = defineType({
     }),
     paragraphs(),
     defineField({ name: "cta", type: "cta" }),
+    defineField({
+      name: "gridLabel",
+      type: "string",
+      description:
+        "Sits above the year grid. Keep it honest — the grid is not student data.",
+    }),
+    defineField({
+      name: "gridSummary",
+      type: "string",
+      description: "Under the grid, until a day is picked.",
+    }),
+    defineField({
+      name: "dayTitle",
+      type: "string",
+      description: "The heading shown after a square is opened.",
+    }),
+    defineField({
+      name: "weekdayBody",
+      type: "text",
+      rows: 3,
+      description: "The line under it when the square was a weekday.",
+    }),
+    defineField({
+      name: "weekendBody",
+      type: "text",
+      rows: 3,
+      description: "And when it was a Saturday or a Sunday.",
+    }),
+    // The week itself is not a field: it lives in `src/data/schedule.ts`,
+    // tied to four specific photographs. See the note there.
   ],
   preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: "Program", subtitle: title }) },
 });
 
 export const admissionsSection = defineType({
   name: "admissionsSection",
-  title: "Admissions",
+  title: "Students",
   type: "object",
+  description:
+    "One title, a little copy, and the applicant video row. The row is built from the Applicant documents, not from this section.",
   fields: [
-    defineField({
-      name: "image",
-      type: "image",
-      description: "The wide plate above the copy. Roughly 2:1.",
-      options: { hotspot: true },
-      fields: [
-        defineField({
-          name: "alt",
-          type: "string",
-          title: "Alternative text",
-          validation: (rule) => rule.required(),
-        }),
-      ],
-    }),
     defineField({
       name: "heading",
       type: "text",
       rows: 3,
       validation: (rule) => rule.required(),
     }),
-    paragraphs(),
-    defineField({ name: "cta", type: "cta" }),
-  ],
-  preview: { select: { title: "heading", media: "image" }, prepare: ({ title, media }) => ({ title: "Admissions", subtitle: title, media }) },
-});
-
-export const peopleWallSection = defineType({
-  name: "peopleWallSection",
-  title: "People wall",
-  type: "object",
-  fields: [
-    defineField({
-      name: "layout",
-      type: "string",
-      description:
-        "Which of the two people layouts the page ships with. The ?people= switcher still overrides this locally.",
-      options: {
-        list: [
-          { title: "Wall (pinned, heading inverted over the tiles)", value: "wall" },
-          { title: "Stacked (heading and copy above the grid)", value: "stacked" },
-          { title: "Marquee (two video rows drifting around the copy)", value: "marquee" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "wall",
-    }),
-    defineField({
-      name: "heading",
-      type: "text",
-      rows: 2,
-      description: "Sits over the wall in mix-blend-difference white.",
-      validation: (rule) => rule.required(),
-    }),
     paragraphs(
       "paragraphs",
-      'One entry per paragraph. Only the "Stacked" layout has room for these.',
+      "One entry per paragraph. Keep it short — the videos under it are the section.",
     ),
-    defineField({
-      name: "tiles",
-      type: "array",
-      description: "Eight portraits: four across on desktop, two rows.",
-      of: [defineArrayMember({ type: "reference", to: [{ type: "person" }] })],
-    }),
+    defineField({ name: "cta", type: "cta" }),
   ],
-  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: "People wall", subtitle: title }) },
+  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: "Students", subtitle: title }) },
 });
 
 export const closingSection = defineType({
@@ -246,7 +226,7 @@ export const lifeSection = defineType({
         ],
         layout: "radio",
       },
-      initialValue: "splat",
+      initialValue: "bleed",
     }),
     defineField({
       name: "image",
@@ -294,7 +274,7 @@ export const partnersSection = defineType({
         ],
         layout: "radio",
       },
-      initialValue: "marquee",
+      initialValue: "rows",
     }),
     defineField({
       name: "eyebrow",

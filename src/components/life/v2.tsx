@@ -13,9 +13,9 @@ const ease = (t: number) => t * t * (3 - 2 * t);
  *
  * An aerial of the Financial District is traced to line work (see
  * `scripts/trace-sf-lines.mjs`). On entry the drawing lays itself down from the
- * horizon forward; through the middle of the run colour blooms out from the
- * downtown core until the whole frame is photographic; the outlines then fade
- * and leave the plate alone.
+ * horizon forward; once it has, colour wipes down over it on the same axis
+ * until the whole frame is photographic; the outlines then fade and leave the
+ * plate alone.
  *
  * The two layers are the same frame at the same aspect, both `object-cover` in
  * the same box, so they register exactly however the viewport is shaped. They
@@ -27,8 +27,6 @@ const PLATE = {
   photo: "/life/sf-aerial.jpg",
   lines: "/life/sf-lines.webp",
   alt: "Aerial view of the San Francisco Financial District, with the Bay Bridge and the Marin hills beyond",
-  /** Where colour blooms from — the tower cluster, in frame coordinates. */
-  origin: { x: 62, y: 34 },
 };
 
 export default function LifeV2({ id, content }: VariantProps<"life">) {
@@ -58,10 +56,10 @@ export default function LifeV2({ id, content }: VariantProps<"life">) {
       frame = 0;
 
       if (still.matches) {
-        // No draw, no bloom: land on the finished photograph.
+        // No draw, no wipe: land on the finished photograph.
         plate.style.transform = "translate3d(0,0,0) scale(1)";
         lines.style.opacity = "0";
-        photo.style.setProperty("--bloom", "150%");
+        photo.style.setProperty("--wipe", "122%");
         photo.style.opacity = "1";
         heading.style.opacity = "1";
         heading.style.transform = "translate3d(0,0,0)";
@@ -74,6 +72,14 @@ export default function LifeV2({ id, content }: VariantProps<"life">) {
       const { top, height } = track.getBoundingClientRect();
       const p = clamp(-top / Math.max(height - vh, 1));
 
+      // `p` only starts once the section has pinned, which leaves a full
+      // viewport of bare background scrolling past before anything happens.
+      // `arc` spans the approach and the pinned run as one progress — 0 when
+      // the section's top is at the bottom of the window, 1 at the end of the
+      // track — so the heading can begin low on the approach and keep rising
+      // straight through the pin. It crosses the pin at vh / height.
+      const arc = clamp((vh - top) / height);
+
       // A slow push-in across the whole run, so the frame never sits dead
       // between phases.
       //
@@ -84,27 +90,44 @@ export default function LifeV2({ id, content }: VariantProps<"life">) {
       // of the drift at every p, not just at the end of the run.
       plate.style.transform = `translate3d(0, ${p * -2.5}vh, 0) scale(${1.05 + p * 0.07})`;
 
-      // The drawing lays down from the horizon forward. The wipe edge is soft
-      // and runs well past the bottom so the near field never snaps in.
-      const draw = ease(range(p, 0.04, 0.42));
+      // The drawing lays down from the horizon forward, and only once the
+      // heading has landed and carried a little way up the frame — the plate
+      // arrives to copy that is already there, rather than the two competing
+      // for the eye on entry. The wipe edge is soft and runs well past the
+      // bottom so the near field never snaps in.
+      const draw = ease(range(p, 0.06, 0.38));
       lines.style.setProperty("--draw", `${-12 + draw * 126}%`);
-      lines.style.opacity = `${range(p, 0.02, 0.12)}`;
 
-      // Colour blooms out of the tower cluster and overtakes the drawing.
-      const bloom = ease(range(p, 0.38, 0.76));
-      photo.style.opacity = `${range(p, 0.38, 0.46)}`;
-      photo.style.setProperty("--bloom", `${bloom * 145}%`);
+      // Colour wipes down the frame, starting only once the ink has finished
+      // laying down. Both edges travel top to bottom, so overlapping them
+      // would read as one edge doing two jobs and the drawing would never get
+      // a beat of being a drawing; the feather here is softer than the ink's
+      // for the same reason.
+      const wipe = ease(range(p, 0.4, 0.72));
+      photo.style.opacity = `${range(p, 0.4, 0.46)}`;
+      photo.style.setProperty("--wipe", `${-22 + wipe * 144}%`);
 
-      // The ink leaves close behind the bloom rather than after it. At this
+      // The ink leaves close behind the wipe rather than after it. At this
       // line weight a long overlap reads as a black cutout laid over the
       // photograph instead of a drawing giving way to one.
-      lines.style.opacity = `${(1 - range(p, 0.44, 0.7)) * range(p, 0.02, 0.12)}`;
+      lines.style.opacity = `${(1 - range(p, 0.46, 0.7)) * range(p, 0.04, 0.12)}`;
 
-      const headingIn = range(p, 0.1, 0.36);
-      heading.style.opacity = `${headingIn}`;
-      heading.style.transform = `translate3d(0, ${(1 - headingIn) * 14}vh, 0)`;
+      // The fade starts where the heading clears the bottom of the window
+      // (arc 0.085 at this resting line) rather than before it. Starting any
+      // earlier spends the fade below the fold, so the heading scrolls into
+      // frame already half up and the transition is never seen.
+      //
+      // The rise runs much longer than the fade and carries on well past the
+      // pin under its own transform.
+      //
+      // Most of the upward travel is the page scrolling the section into
+      // place, which is fixed by geometry; the 8vh here is the part that is
+      // actually animated, and it is what keeps the heading moving once the
+      // section has pinned and the page no longer carries it.
+      heading.style.opacity = `${range(arc, 0.085, 0.21)}`;
+      heading.style.transform = `translate3d(0, ${(1 - range(arc, 0.05, 0.6)) * 8}vh, 0)`;
 
-      const panelIn = range(p, 0.78, 0.96);
+      const panelIn = range(p, 0.74, 0.94);
       panel.style.transform = `translate3d(0, ${(1 - panelIn) * 100}%, 0)`;
       // Full strength: the gradient above carries its own falloff, so scaling
       // it down here would only thin the part doing the work.
@@ -128,17 +151,19 @@ export default function LifeV2({ id, content }: VariantProps<"life">) {
   }, []);
 
   return (
-    <div ref={trackRef} id={id} className="h-[380vh] bg-background">
+    <div ref={trackRef} id={id} className="h-[300vh] bg-background">
       <section className="sticky top-0 h-screen overflow-hidden bg-background [isolation:isolate]">
         <div ref={plateRef} className="absolute inset-0 will-change-transform">
-          {/* The photograph, revealed through a mask that opens from the core. */}
+          {/* The photograph, revealed by a wipe running down the frame. */}
           <div
             ref={photoRef}
             className="absolute inset-0 opacity-0 will-change-[opacity]"
             style={{
-              ["--bloom" as string]: "0%",
-              maskImage: `radial-gradient(circle at ${PLATE.origin.x}% ${PLATE.origin.y}%, #000 calc(var(--bloom) * 0.62), transparent var(--bloom))`,
-              WebkitMaskImage: `radial-gradient(circle at ${PLATE.origin.x}% ${PLATE.origin.y}%, #000 calc(var(--bloom) * 0.62), transparent var(--bloom))`,
+              ["--wipe" as string]: "-22%",
+              maskImage:
+                "linear-gradient(to bottom, #000 calc(var(--wipe) - 22%), transparent var(--wipe))",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 calc(var(--wipe) - 22%), transparent var(--wipe))",
             }}
           >
             <Image
@@ -205,7 +230,7 @@ export default function LifeV2({ id, content }: VariantProps<"life">) {
 
         <h2
           ref={headingRef}
-          className="pointer-events-none absolute inset-x-0 top-[22vh] mx-auto w-[min(1100px,88vw)] text-center text-[clamp(2rem,6vw,5.5rem)] font-medium leading-[1] tracking-[-0.04em] text-white opacity-0 mix-blend-difference will-change-[transform,opacity]"
+          className="pointer-events-none absolute inset-x-0 top-[18vh] mx-auto w-[min(1100px,88vw)] text-center text-[clamp(2rem,6vw,5.5rem)] font-medium leading-[1] tracking-[-0.04em] text-white opacity-0 mix-blend-difference will-change-[transform,opacity]"
         >
           {content.heading}
         </h2>

@@ -18,7 +18,7 @@ export const person = defineType({
       name: "affiliation",
       type: "string",
       description:
-        'The second line under the name: "OpenAI", "Stanford". One line, not a bio.',
+        'The title line under the name: "Founder of OpenAI", "CEO of NVIDIA", "Author of Sapiens". Say what they are, not just where they work — but keep it to one line, never a bio.',
     }),
     defineField({
       name: "portrait",

@@ -13,7 +13,10 @@ export type Portrait = {
    * simply goes uncaptioned until the client identifies it.
    */
   name: string;
-  /** The second line: "OpenAI", not a sentence. */
+  /**
+   * The title line under the name, in mono: "Founder of OpenAI", "CEO of
+   * NVIDIA". What they are, not just where — one line, never a bio.
+   */
   affiliation: string;
   /** Fades up over the still on hover. Null until a master is on Mux. */
   video: MuxVideo | null;
@@ -36,8 +39,12 @@ export type Applicant = {
   loop: string;
   /** Held until the excerpt decodes, and the whole tile under reduced motion. */
   poster: string;
-  /** Mux playback id for the full interview. Empty until the master is uploaded. */
-  playbackId: string;
+  /**
+   * The full interview, with audio, played in the tile's modal. Null until the
+   * master is on Mux *with* an mp4 static rendition — the tile is unclickable
+   * until then rather than opening a modal with nothing in it.
+   */
+  video: MuxVideo | null;
 };
 
 /** A Mux asset resolved to the two URLs a plain `<video>` needs. */
@@ -67,29 +74,64 @@ export type NetworkContent = {
   portraits: Portrait[];
 };
 
+/** Drives the block's illustration and the label above its title. */
+export type ScheduleCategory =
+  | "build"
+  | "lunch"
+  | "learn"
+  | "connect"
+  | "showcase"
+  | "open";
+
+/** One block in the illustrative week. See `src/data/schedule.ts`. */
+export type ScheduleEvent = {
+  /** 0 = Monday … 4 = Friday. The open day uses -1: it belongs to no weekday. */
+  day: number;
+  /** Decimal hours, so 16.5 is 4:30 PM. Formatted at render. */
+  start: number;
+  end: number;
+  title: string;
+  category: ScheduleCategory;
+  description: string;
+  image: Picture;
+};
+
 export type ProgramContent = {
   heading: string;
   subheading: string;
+  /**
+   * Only the "Original" layout prints these. The schedule layout that replaced
+   * it carries no body copy, but the field stays so the switcher can fall back
+   * without the dataset losing the paragraphs.
+   */
   paragraphs: string[];
   cta: Cta;
+  /** The line above the year grid, next to the "illustrative" disclaimer. */
+  gridLabel: string;
+  /** Standing in for a date until a day is chosen. */
+  gridSummary: string;
+  /** The heading the day view shows for every day. */
+  dayTitle: string;
+  /** The line under it, which turns on whether the square was a weekday. */
+  weekdayBody: string;
+  weekendBody: string;
+  /** The illustrative week a weekday square opens onto. */
+  schedule: ScheduleEvent[];
+  /** What a weekend square opens onto instead. */
+  openDay: ScheduleEvent;
 };
 
+/**
+ * The merged student section: one heading, a short block of copy, and the
+ * applicant row. The workbench plate and the separate "kind of people we're
+ * looking for" screen both folded into this — the videos are the only visual.
+ */
 export type AdmissionsContent = {
-  image: Picture;
   heading: string;
   paragraphs: string[];
-  cta: Cta;
-};
-
-export type PeopleContent = {
-  /** Matches a `Variant["id"]` in `src/components/people/index.ts`. */
-  layout: string;
-  heading: string;
-  /** Only the layouts that put the wall in normal flow have room for these. */
-  paragraphs: string[];
-  tiles: Portrait[];
-  /** The marquee layout drifts these instead of `tiles`. */
+  /** The tiles the row drifts. Also reused on `/admissions`. */
   applicants: Applicant[];
+  cta: Cta;
 };
 
 export type LifeContent = {
@@ -255,7 +297,6 @@ export type SectionContent = {
   network: NetworkContent;
   program: ProgramContent;
   admissions: AdmissionsContent;
-  people: PeopleContent;
   partners: PartnersContent;
   life: LifeContent;
   closing: ClosingContent;

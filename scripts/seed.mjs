@@ -97,19 +97,21 @@ const PEOPLE = [
   { slug: "larry-page", name: "Larry Page", affiliation: "Google", file: "portrait-10.jpg", relationship: "advisor", fields: ["engineering", "product"] },
 ];
 
+// The ten founding partners, mirroring `src/data/partners.ts` — keep the two
+// in step. a16z is deliberately absent: it backs HAA but does not pay for a
+// slot here, and these ten do. Scales are equal-area, not equal-height; see
+// the note in that file before changing one.
 const PARTNERS = [
-  { slug: "nvidia", name: "NVIDIA", scale: 1 },
-  // TODO: public/partners/a16z.svg is not in the repo yet. Until it lands the
-  // loop below skips this entry rather than failing the whole seed.
-  { slug: "a16z", name: "Andreessen Horowitz", scale: 1 },
-  { slug: "anduril", name: "Anduril", scale: 0.85 },
-  { slug: "anthropic", name: "Anthropic", scale: 1 },
-  { slug: "openai", name: "OpenAI", scale: 1 },
+  { slug: "nvidia", name: "NVIDIA", scale: 0.97 },
+  { slug: "anduril", name: "Anduril", scale: 0.96 },
+  { slug: "anthropic", name: "Anthropic", scale: 0.75 },
+  { slug: "openai", name: "OpenAI", scale: 1.16 },
   { slug: "meta", name: "Meta", scale: 1 },
-  { slug: "coinbase", name: "Coinbase", scale: 2.1 },
-  { slug: "replit", name: "Replit", scale: 1 },
-  { slug: "stripe", name: "Stripe", scale: 1 },
-  { slug: "palantir", name: "Palantir", scale: 1 },
+  { slug: "coinbase", name: "Coinbase", scale: 0.94 },
+  { slug: "replit", name: "Replit", scale: 1.07 },
+  { slug: "stripe", name: "Stripe", scale: 1.44 },
+  { slug: "palantir", name: "Palantir", scale: 1.09 },
+  { slug: "google", name: "Google", scale: 1.29 },
 ];
 
 
@@ -157,7 +159,6 @@ async function main() {
   console.log("\nIdentity:");
   const fullLogo = await uploadImage("full-logo.svg");
   const wordmark = await uploadImage("wordmark.svg");
-  const workshop = await uploadImage("workshop.jpg");
   const skyline = await uploadImage("life/sf.jpg");
   // Placeholder favicon until a purpose-drawn square icon replaces it.
   const favicon = await uploadImage("mark.svg");
@@ -216,40 +217,30 @@ async function main() {
     },
     program: {
       _type: "programSection",
-      heading: "Build your education around what you want to pursue.",
-      subheading:
-        "HAA is a San Francisco-based residential alternative to the traditional college path.",
+      heading: "A year of building.",
+      subheading: "Look closer at a day.",
       paragraphs: [
         "Most of your time is spent on self-directed pursuits: starting a company, building a technical system, conducting research, making art, writing, mastering a new field, or following an idea far enough to discover where it leads.",
         "Around that work, you can choose intensive courses taught by industry leaders, seek guidance from mentors, spend three months working inside a company, and go explore the world.",
       ],
-      cta: { _type: "cta", label: "Explore the program", href: "#curriculum" },
+      cta: { _type: "cta", label: "Explore the program", href: "/curriculum" },
+      gridLabel: "Illustrative year",
+      gridSummary: "Every square is a day of possibility.",
+      dayTitle: "A day at the Academy.",
+      weekdayBody:
+        "Focused time to build, with a community that helps you go further. This is an example of the Academy\u2019s daily rhythm.",
+      weekendBody:
+        "Unscheduled time. Explore the city, recharge, or follow an idea just because you can.",
     },
     admissions: {
       _type: "admissionsSection",
-      image: {
-        ...workshop,
-        alt: "A student working at a bench of half-built electronics",
-      },
-      heading: "For people who have never been good at waiting.",
+      heading: "For people who are hungry to learn and build.",
       paragraphs: [
-        "Maybe you were the person building something after school while everyone else was studying for the test.",
-        "Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
-        "You are curious. You take initiative. You want your work to matter.",
-        "And you want to spend your life around people who have the same intensity.",
+        "Maybe you were the person building something after school while everyone else was studying for the test. Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
+        "We’re looking for you.",
+        "Meet some of the other people who share that drive and are applying to HAA.",
       ],
-      cta: { _type: "cta", label: "Learn about admissions", href: "#admissions" },
-    },
-    peopleWall: {
-      _type: "peopleWallSection",
-      layout: "wall",
-      heading: "Meet the kind of people we’re looking for.",
-      paragraphs: [
-        "They’re already building, researching, experimenting, and pursuing ideas of their own.",
-        "Meet some of HAA’s early applicants and see what they’re working on.",
-      ],
-      // The wall is four across by two down.
-      tiles: keyed(people.slice(0, 8).map(ref)),
+      cta: { _type: "cta", label: "Learn about admissions", href: "/admissions" },
     },
     partners: {
       _type: "partnersSection",

@@ -4,7 +4,6 @@ import { variants as hero } from "@/components/hero";
 import { variants as life } from "@/components/life";
 import { variants as network } from "@/components/network";
 import { variants as partners } from "@/components/partners";
-import { variants as people } from "@/components/people";
 import { variants as program } from "@/components/program";
 import { defineSection } from "./define";
 import type { SectionDef } from "./types";
@@ -24,17 +23,13 @@ export const SECTIONS: SectionDef[] = [
     anchorId: "program",
     variants: program,
   }),
+  // One section for both student screens now: the heading, the short copy and
+  // the applicant row. Keeps the `admissions` anchor the nav panel links to.
   defineSection({
     key: "admissions",
-    label: "Admissions",
+    label: "Students",
     anchorId: "admissions",
     variants: admissions,
-  }),
-  defineSection({
-    key: "people",
-    label: "People",
-    anchorId: "people",
-    variants: people,
   }),
   defineSection({
     key: "partners",

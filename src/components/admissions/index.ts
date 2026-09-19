@@ -3,5 +3,5 @@ import v1 from "./v1";
 
 // Add a variant: drop `v2.tsx` in this folder, then add a line here.
 export const variants: Variant<"admissions">[] = [
-  { id: "original", label: "Original", Component: v1 },
+  { id: "marquee", label: "Marquee", Component: v1 },
 ];

@@ -21,7 +21,6 @@ import {
   lifeSection,
   networkSection,
   partnersSection,
-  peopleWallSection,
   programSection,
 } from "./sections";
 import { siteSettings } from "./siteSettings";
@@ -69,7 +68,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   networkSection,
   programSection,
   admissionsSection,
-  peopleWallSection,
   partnersSection,
   lifeSection,
   closingSection,

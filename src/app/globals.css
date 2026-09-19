@@ -83,9 +83,83 @@ body {
   animation: marquee-right 46s linear infinite;
 }
 
+/*
+ * The applicant row's arrival, played once when the section is first scrolled
+ * to: three cards' worth of track whips past and hauls up into the drift.
+ *
+ * The distance is `--intro-shift`, set on the track itself, because three
+ * cards is a fraction of the track rather than a fixed length — the row sets
+ * it from its own tile count in `ApplicantRow.tsx`.
+ *
+ * The run-in has to *leave* at the loop's speed or the handover reads as a
+ * stumble, and that pins the curve's tail to the ratio between the two:
+ *
+ *   loop      50% of a 16-tile track per 46s   ~   51px per second
+ *   run-in    3 cards (~873px) per 0.45s       ~ 1940px per second
+ *   tail      51 / 1940                        =  0.026
+ *
+ * A cubic-bezier leaves at (1 - y2) / (1 - x2), so the second control point
+ * sits at 0.7, 0.992 to hit that 0.026.
+ *
+ * The first control point is what spreads the braking out. Pulled in tight
+ * the curve holds its speed and then stops dead in the last few frames, which
+ * reads as a stall rather than a haul-up; at 0.15, 0.38 the first two cards
+ * are done inside 0.21s and the remaining 0.24s is all deceleration —
+ * 1891 -> 1540 -> 1105 -> 696 -> 69px/s — so the braking lands across the
+ * third card, where it can be seen.
+ *
+ * Retune the tail if the duration, the card count or the 46s changes. Two
+ * more applicants take the row from sixteen tiles to twelve, which leaves
+ * this landing ~30% hot — mild, but worth a pass at that point.
+ *
+ * Each run-in ends exactly where its loop begins. The track holds two
+ * identical copies of the tiles, so translateX(0) and -50% show the same
+ * pixels — which is what lets the infinite animation pick up from the end of
+ * the run-in without a seam.
+ */
+@keyframes marquee-right-intro {
+  from {
+    transform: translateX(calc(-1 * var(--intro-shift)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes marquee-left-intro {
+  from {
+    transform: translateX(calc(-50% + var(--intro-shift)));
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-right-intro {
+  animation: marquee-right-intro 0.45s cubic-bezier(0.15, 0.38, 0.7, 0.992) both;
+}
+
+.marquee-left-intro {
+  animation: marquee-left-intro 0.45s cubic-bezier(0.15, 0.38, 0.7, 0.992) both;
+}
+
+/*
+ * Where the track waits before the run-in fires. Without this it would sit at
+ * translateX(0) and snap sideways on the run-in's first frame.
+ */
+.marquee-right-parked {
+  transform: translateX(calc(-1 * var(--intro-shift)));
+}
+
+.marquee-left-parked {
+  transform: translateX(calc(-50% + var(--intro-shift)));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-left,
-  .marquee-right {
+  .marquee-right,
+  .marquee-left-intro,
+  .marquee-right-intro {
     animation: none;
   }
 }

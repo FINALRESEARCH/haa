@@ -5,6 +5,7 @@ import { placeholderVideo } from "@/data/people";
 import type {
   AboutChapter,
   AboutContent,
+  Applicant,
   CurriculumChapter,
   CurriculumContent,
   CoursesPageContent,
@@ -28,7 +29,7 @@ import { SITE_CONTENT_QUERY } from "./queries";
 // A speaker tile is close to full-bleed now, not a fifth of a 1150px grid.
 const PORTRAIT_WIDTH = 2000;
 const PLATE_WIDTH = 2100;
-const LOGO_WIDTH = 400;
+const LOGO_WIDTH = 600;
 // Crawlers read this at face value; no need to serve it at retina width.
 const OG_IMAGE_WIDTH = 1200;
 
@@ -58,6 +59,8 @@ function raw(value: unknown, fallback: string, allowed: RegExp): string {
 const COLOUR = /^(#[0-9a-fA-F]{3,8}|rgba?\([\d.,%\s]+\))$/;
 const MUX_ID = /^[A-Za-z0-9]+$/;
 const MP4_RENDITION = /^[a-z0-9-]+\.mp4$/;
+/** The slug names two files under `/applicants/`, so it goes into a URL path. */
+const SLUG = /^[a-z0-9-]+$/;
 /** Preference order for the static rendition the hero plays, best first. */
 const RENDITION_ORDER = [
   "highest.mp4",
@@ -146,7 +149,7 @@ function muxVideo(value: unknown): MuxVideo | null {
  * attached to their `person` document the tile borrows an applicant loop so
  * the hover reads as designed. Drop the argument once the clips land.
  *
- * The people wall passes it nothing — those tiles are stills by design.
+ * The applicant row passes it nothing: those tiles are video to begin with.
  */
 function portraits(
   value: unknown,
@@ -166,6 +169,34 @@ function portraits(
       affiliation: str(raw?.affiliation, ""),
       video:
         video ?? (standInForMissingVideo ? placeholderVideo(kept.length) : null),
+    });
+  }
+  return kept.length ? kept : fallback;
+}
+
+/**
+ * The applicant row. Each document carries a name, a pursuit and the full
+ * interview on Mux; the drifting tile itself is a pair of local files named
+ * after the slug, cut by `scripts/encode-loops.mjs` — ten of those load on
+ * every page view, which is the one place an asset CDN's bandwidth would bite.
+ *
+ * An entry without a slug is dropped: there would be no loop to drift. A
+ * missing or rendition-less Mux asset is not fatal, it just leaves the tile
+ * unclickable until the master is uploaded.
+ */
+function applicants(value: unknown, fallback: Applicant[]): Applicant[] {
+  if (!Array.isArray(value)) return fallback;
+  const kept: Applicant[] = [];
+  for (const entry of value) {
+    const row = obj(entry);
+    const slug = raw(row?.slug, "", SLUG);
+    if (!slug) continue;
+    kept.push({
+      name: str(row?.name, ""),
+      pursuit: str(row?.pursuit, ""),
+      loop: `/applicants/${slug}-loop.mp4`,
+      poster: `/applicants/${slug}-poster.jpg`,
+      video: muxVideo(row?.video),
     });
   }
   return kept.length ? kept : fallback;
@@ -335,7 +366,6 @@ export function mergeContent(data: unknown): SiteContent {
   const network = obj(home?.network);
   const program = obj(home?.program);
   const admissions = obj(home?.admissions);
-  const peopleWall = obj(home?.peopleWall);
   const partners = obj(home?.partners);
   const life = obj(home?.life);
   const closing = obj(home?.closing);
@@ -401,27 +431,38 @@ export function mergeContent(data: unknown): SiteContent {
           fallback.sections.program.paragraphs,
         ),
         cta: cta(program?.cta, fallback.sections.program.cta),
+        gridLabel: str(program?.gridLabel, fallback.sections.program.gridLabel),
+        gridSummary: str(
+          program?.gridSummary,
+          fallback.sections.program.gridSummary,
+        ),
+        dayTitle: str(program?.dayTitle, fallback.sections.program.dayTitle),
+        weekdayBody: str(
+          program?.weekdayBody,
+          fallback.sections.program.weekdayBody,
+        ),
+        weekendBody: str(
+          program?.weekendBody,
+          fallback.sections.program.weekendBody,
+        ),
+        // The week is a local fixture tied to four specific photographs, so
+        // the dataset can't override it.
+        schedule: fallback.sections.program.schedule,
+        openDay: fallback.sections.program.openDay,
       },
       admissions: {
-        image: picture(admissions?.image, fallback.sections.admissions.image),
         heading: str(admissions?.heading, fallback.sections.admissions.heading),
         paragraphs: paragraphs(
           admissions?.paragraphs,
           fallback.sections.admissions.paragraphs,
         ),
-        cta: cta(admissions?.cta, fallback.sections.admissions.cta),
-      },
-      people: {
-        layout: str(peopleWall?.layout, fallback.sections.people.layout),
-        heading: str(peopleWall?.heading, fallback.sections.people.heading),
-        paragraphs: paragraphs(
-          peopleWall?.paragraphs,
-          fallback.sections.people.paragraphs,
+        // A collection, not a field on the homepage — the same row is reused
+        // on `/admissions`.
+        applicants: applicants(
+          root?.applicants,
+          fallback.sections.admissions.applicants,
         ),
-        tiles: portraits(peopleWall?.tiles, fallback.sections.people.tiles),
-        // The applicant tiles are local files cut by `scripts/encode-loops.mjs`,
-        // not Sanity assets, so the dataset has nothing to override here yet.
-        applicants: fallback.sections.people.applicants,
+        cta: cta(admissions?.cta, fallback.sections.admissions.cta),
       },
       partners: {
         layout: str(partners?.layout, fallback.sections.partners.layout),

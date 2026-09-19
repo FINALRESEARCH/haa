@@ -5,6 +5,7 @@ import { CURRICULUM } from "./curriculum.data.mjs";
 import { PARTNER_LOGOS } from "@/data/partners";
 import { applicants } from "@/data/applicants";
 import { people } from "@/data/people";
+import { openDay, schedule } from "@/data/schedule";
 import type { CurriculumChapter, SiteContent } from "./types";
 
 const MARK_PATH =
@@ -46,7 +47,7 @@ export const DEFAULT_CONTENT: SiteContent = {
 
   sections: {
     hero: {
-      layout: "original",
+      layout: "video",
       headline: "An academy for unusually ambitious young people.",
       body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
       cta: { label: "Apply to HAA", href: "#apply" },
@@ -64,45 +65,38 @@ export const DEFAULT_CONTENT: SiteContent = {
     },
 
     program: {
-      heading: "Build your education around what you want to pursue.",
-      subheading:
-        "HAA is a San Francisco-based residential alternative to the traditional college path.",
+      heading: "A year of building.",
+      subheading: "Look closer at a day.",
+      // Kept for the "Original" layout only; the schedule layout prints none.
       paragraphs: [
         "Most of your time is spent on self-directed pursuits: starting a company, building a technical system, conducting research, making art, writing, mastering a new field, or following an idea far enough to discover where it leads.",
         "Around that work, you can choose intensive courses taught by industry leaders, seek guidance from mentors, spend three months working inside a company, and go explore the world.",
       ],
-      cta: { label: "Explore the program", href: "#curriculum" },
+      cta: { label: "Explore the program", href: "/curriculum" },
+      gridLabel: "Illustrative year",
+      gridSummary: "Every square is a day of possibility.",
+      dayTitle: "A day at the Academy.",
+      weekdayBody:
+        "Focused time to build, with a community that helps you go further. This is an example of the Academy’s daily rhythm.",
+      weekendBody:
+        "Unscheduled time. Explore the city, recharge, or follow an idea just because you can.",
+      schedule,
+      openDay,
     },
 
     admissions: {
-      image: {
-        src: "/workshop.jpg",
-        alt: "A student working at a bench of half-built electronics",
-      },
-      heading: "For people who have never been good at waiting.",
+      heading: "For people who are hungry to learn and build.",
       paragraphs: [
-        "Maybe you were the person building something after school while everyone else was studying for the test.",
-        "Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
-        "You are curious. You take initiative. You want your work to matter.",
-        "And you want to spend your life around people who have the same intensity.",
+        "Maybe you were the person building something after school while everyone else was studying for the test. Maybe you joined the robotics club, started a company, taught yourself to code, obsessed over an obscure subject, made films, ran events, built machines, wrote constantly, or found some other thing you couldn’t stop thinking about.",
+        "We’re looking for you.",
+        "Meet some of the other people who share that drive and are applying to HAA.",
       ],
-      cta: { label: "Learn about admissions", href: "#admissions" },
-    },
-
-    people: {
-      layout: "wall",
-      heading: "Meet the kind of people we’re looking for.",
-      paragraphs: [
-        "They’re already building, researching, experimenting, and pursuing ideas of their own.",
-        "Meet some of HAA’s early applicants and see what they’re working on.",
-      ],
-      // The wall is four across by two down, so it takes the first eight.
-      tiles: people.slice(0, 8),
       applicants,
+      cta: { label: "Learn about admissions", href: "/admissions" },
     },
 
     life: {
-      layout: "splat",
+      layout: "bleed",
       image: {
         src: "/life/sf.jpg",
         alt: "San Francisco and the Bay Bridge at dusk, seen from across the bay",
@@ -125,7 +119,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       ],
       apply: { label: "Apply to HAA", href: "#apply" },
       links: [
-        { label: "Explore the Program", href: "/program" },
+        { label: "Explore the Program", href: "/curriculum" },
         { label: "Meet the Network", href: "/network" },
         { label: "Admissions", href: "/admissions" },
       ],
@@ -133,7 +127,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     },
 
     partners: {
-      layout: "marquee",
+      layout: "rows",
       eyebrow: "Partners",
       heading: "Connected to the institutions shaping what comes next.",
       body: "HAA is being built with a network spanning frontier technology, entrepreneurship, research, and industry.",

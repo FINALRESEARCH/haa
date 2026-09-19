@@ -35,15 +35,20 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
     body,
     readMoreLabel
   },
+  "applicants": *[_type == "applicant"] | order(name asc){
+    name,
+    pursuit,
+    "slug": slug.current,
+    video{ asset->{ playbackId, "renditions": data.static_renditions.files[].name } }
+  },
   "home": *[_type == "homePage"][0]{
     hero{ layout, headline, body, cta, video{ asset->{
       playbackId,
       "renditions": data.static_renditions.files[].name
     } } },
     network{ layout, heading, body, cta, portraits[]->${PERSON} },
-    program{ heading, subheading, paragraphs, cta },
-    admissions{ image, heading, paragraphs, cta },
-    peopleWall{ layout, heading, paragraphs, tiles[]->${PERSON} },
+    program{ heading, subheading, paragraphs, cta, gridLabel, gridSummary, dayTitle, weekdayBody, weekendBody },
+    admissions{ heading, paragraphs, cta },
     partners{ layout, eyebrow, heading, body, logos[]->{ name, logo, scale } },
     life{ layout, image, heading, paragraphs, cta },
     closing{ layout, heading, paragraphs, applyLabel, links }
