@@ -94,7 +94,7 @@ export const ABOUT = {
   ],
 
   closing: {
-    applyLabel: "Apply to HAA",
+    applyLabel: "Apply",
     links: [
       { label: "Explore the HAA Experience", href: "/curriculum" },
       { label: "Meet the Network", href: "/network" },

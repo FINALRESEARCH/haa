@@ -20,7 +20,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   settings: {
     title: "The Horowitz Andreessen Academy",
     description: "An academy for unusually ambitious young people.",
-    applyCta: { label: "Apply Now", href: "#apply" },
+    applyCta: { label: "Apply", href: "#apply" },
     fullLogo: "/full-logo.svg",
     wordmark: "/wordmark.svg",
     markPath: MARK_PATH,
@@ -50,7 +50,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       layout: "video",
       headline: "An academy for unusually ambitious young people.",
       body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
-      cta: { label: "Apply to HAA", href: "#apply" },
+      cta: { label: "Apply", href: "#apply" },
       // Genuinely blank: the footage only ever comes from Mux.
       video: null,
       markPath: MARK_PATH,
@@ -117,7 +117,7 @@ export const DEFAULT_CONTENT: SiteContent = {
         "Bring your obsessions, your unfinished ideas, the questions you can’t leave alone, and the things you have already started.",
         "We’ll give you exceptional peers, extraordinary teachers, access to a remarkable network, and room to pursue them seriously.",
       ],
-      apply: { label: "Apply to HAA", href: "#apply" },
+      apply: { label: "Apply", href: "#apply" },
       links: [
         { label: "Explore the Program", href: "/curriculum" },
         { label: "Meet the Network", href: "/network" },

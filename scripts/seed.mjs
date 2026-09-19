@@ -169,7 +169,7 @@ async function main() {
     _type: "siteSettings",
     title: "The Horowitz Andreessen Academy",
     description: "An academy for unusually ambitious young people.",
-    applyCta: { _type: "cta", label: "Apply Now", href: "#apply" },
+    applyCta: { _type: "cta", label: "Apply", href: "#apply" },
     fullLogo,
     wordmark,
     markPath: MARK_PATH,
@@ -206,7 +206,7 @@ async function main() {
       _type: "heroSection",
       headline: "An academy for unusually ambitious young people.",
       body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
-      cta: { _type: "cta", label: "Apply to HAA", href: "#apply" },
+      cta: { _type: "cta", label: "Apply", href: "#apply" },
     },
     network: {
       _type: "networkSection",
@@ -273,7 +273,7 @@ async function main() {
         "Bring your obsessions, your unfinished ideas, the questions you can\u2019t leave alone, and the things you have already started.",
         "We\u2019ll give you exceptional peers, extraordinary teachers, access to a remarkable network, and room to pursue them seriously.",
       ],
-      applyLabel: "Apply to HAA",
+      applyLabel: "Apply",
       links: keyed([
         { _type: "cta", label: "Explore the Program", href: "/program" },
         { _type: "cta", label: "Meet the Network", href: "/network" },

@@ -219,6 +219,6 @@ export const CURRICULUM = {
 
   closing: {
     heading: "What will you pursue?",
-    applyLabel: "Apply to HAA",
+    applyLabel: "Apply",
   },
 };

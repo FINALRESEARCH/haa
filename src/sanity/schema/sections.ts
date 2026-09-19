@@ -194,7 +194,7 @@ export const closingSection = defineType({
       title: "Apply button label",
       description:
         "The button's destination is the apply link in Site settings, so the form URL is only ever set in one place.",
-      initialValue: "Apply to HAA",
+      initialValue: "Apply",
     }),
     defineField({
       name: "links",

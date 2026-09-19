@@ -229,7 +229,7 @@ const curriculumPage = defineType({
       type: "string",
       description:
         "The primary button at the foot of the page. Its link comes from Site settings, so it can never drift from the other apply buttons.",
-      initialValue: "Apply to HAA",
+      initialValue: "Apply",
     }),
   ],
   preview: {
