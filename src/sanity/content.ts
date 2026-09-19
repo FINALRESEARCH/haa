@@ -3,6 +3,7 @@ import { cache } from "react";
 import { DEFAULT_CONTENT } from "@/content/defaults";
 import type {
   Cta,
+  HeroVideo,
   NavPanel,
   PartnerLogo,
   Picture,
@@ -44,6 +45,19 @@ function raw(value: unknown, fallback: string, allowed: RegExp): string {
 }
 
 const COLOUR = /^(#[0-9a-fA-F]{3,8}|rgba?\([\d.,%\s]+\))$/;
+const MUX_ID = /^[A-Za-z0-9]+$/;
+const MP4_RENDITION = /^[a-z0-9-]+\.mp4$/;
+/** Preference order for the static rendition the hero plays, best first. */
+const RENDITION_ORDER = [
+  "highest.mp4",
+  "capped-1080p.mp4",
+  "2160p.mp4",
+  "1440p.mp4",
+  "1080p.mp4",
+  "high.mp4",
+  "720p.mp4",
+  "medium.mp4",
+];
 const SVG_PATH = /^[\d\s,.eE+-]*[MmZzLlHhVvCcSsQqTtAa][A-Za-z\d\s,.eE+-]*$/;
 
 function paragraphs(value: unknown, fallback: string[]): string[] {
@@ -81,6 +95,36 @@ function picture(value: unknown, fallback: Picture): Picture {
   const src = imageUrl(raw as never, PLATE_WIDTH);
   if (!src) return fallback;
   return { src, alt: str(raw?.alt, fallback.alt) };
+}
+
+/**
+ * A Mux asset turned into the two plain URLs the hero's `<video>` wants: a
+ * static rendition rather than an adaptive stream, which is what lets the
+ * background loop stay a bare video tag, and a thumbnail as its poster.
+ *
+ * Nothing is returned unless the asset actually has a rendition — MP4 support
+ * is per-asset on Mux, and a stream URL for a rendition that was never
+ * encoded 404s, which reads on the page as a hero that is simply black.
+ */
+function heroVideo(value: unknown): HeroVideo | null {
+  const asset = obj(obj(value)?.asset);
+  const playbackId = raw(asset?.playbackId, "", MUX_ID);
+  if (!playbackId) return null;
+
+  const renditions = Array.isArray(asset?.renditions) ? asset.renditions : [];
+  const names = renditions
+    .map((name) => raw(name, "", MP4_RENDITION))
+    .filter(Boolean);
+  // Highest first: this is a full-bleed background, and the smaller ladder
+  // rungs are visibly soft at that size.
+  const name =
+    RENDITION_ORDER.find((candidate) => names.includes(candidate)) ?? names[0];
+  if (!name) return null;
+
+  return {
+    src: `https://stream.mux.com/${playbackId}/${name}`,
+    poster: `https://image.mux.com/${playbackId}/thumbnail.jpg?width=1920&time=0`,
+  };
 }
 
 function portraits(value: unknown, fallback: Portrait[]): Portrait[] {
@@ -184,6 +228,7 @@ export function mergeContent(data: unknown): SiteContent {
         headline: str(hero?.headline, fallback.sections.hero.headline),
         body: str(hero?.body, fallback.sections.hero.body),
         cta: cta(hero?.cta, fallback.sections.hero.cta),
+        video: heroVideo(hero?.video),
         // The sweeping mark is the same drawing as the one in the nav.
         markPath: raw(settings?.markPath, fallback.sections.hero.markPath, SVG_PATH),
       },

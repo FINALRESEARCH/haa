@@ -30,7 +30,10 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
     readMoreLabel
   },
   "home": *[_type == "homePage"][0]{
-    hero{ layout, headline, body, cta },
+    hero{ layout, headline, body, cta, video{ asset->{
+      playbackId,
+      "renditions": data.static_renditions.files[].name
+    } } },
     network{ heading, body, cta, portraits[]->${PERSON} },
     program{ heading, subheading, paragraphs, cta },
     admissions{ image, heading, paragraphs, cta },

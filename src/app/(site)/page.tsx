@@ -1,4 +1,3 @@
-import Nav from "@/components/Nav";
 import VariantSwitcher from "@/components/VariantSwitcher";
 import { getSiteContent } from "@/sanity/content";
 import { SECTIONS } from "@/variants/registry";
@@ -20,7 +19,6 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
   return (
     <>
-      <Nav panels={content.nav} settings={content.settings} />
       <main id="top" className="relative flex flex-col">
         {SECTIONS.map((section) =>
           section.render(selection[section.key] ?? 0, content),

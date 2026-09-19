@@ -1,14 +1,25 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { NavPanel, SiteSettings } from "@/content/types";
+import ArrowUpRight from "./ArrowUpRight";
 import Mark from "./Mark";
 
 // Desktop hover tunables. Dwell only gates the *first* panel — once one is
 // open, moving along the row swaps instantly.
 const PANEL_DWELL_MS = 150;
 const LEAVE_GRACE_MS = 100;
+// Minimum travel before a scroll counts as a direction change.
+const SCROLL_DELTA_PX = 4;
+
+/**
+ * Every panel id is also its route: `src/app/(site)/<id>/page.tsx`. Adding a
+ * panel in the Studio without adding the matching route gives a 404.
+ */
+const panelHref = (id: string) => `/${id}`;
 
 type Props = {
   panels: NavPanel[];
@@ -28,6 +39,8 @@ export default function Nav({ panels, settings }: Props) {
   const navRef = useRef<HTMLElement>(null);
   const dwellTimer = useRef<number | null>(null);
   const leaveTimer = useRef<number | null>(null);
+  // Click events don't carry a pointer type, so the last pointerdown does.
+  const pointerType = useRef<string>("mouse");
   // The last panel stays mounted so it can collapse instead of vanishing.
   const [panel, setPanel] = useState<NavPanel | null>(null);
 
@@ -63,6 +76,15 @@ export default function Nav({ panels, settings }: Props) {
     clearLeave();
   }, [clearDwell, clearLeave]);
 
+  const pathname = usePathname();
+
+  // The nav lives in the layout, so it survives navigation — a followed link
+  // has to close the menu itself or it trails open onto the next page.
+  const closeMenu = useCallback(() => {
+    dismiss();
+    setMobileOpen(false);
+  }, [dismiss]);
+
   useEffect(() => {
     const syncHash = () => {
       const id = window.location.hash.slice(1);
@@ -74,13 +96,21 @@ export default function Nav({ panels, settings }: Props) {
   }, [panels, show]);
 
   useEffect(() => {
+    let lastY = window.scrollY;
     const onScroll = () => {
-      if (window.scrollY > window.innerHeight * 1.4) {
-        setCollapsed(true);
-        dismiss();
-      } else {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      // Ignore sub-pixel jitter and rubber-band overscroll so the bar doesn't
+      // flicker between states.
+      if (Math.abs(delta) < SCROLL_DELTA_PX) return;
+      lastY = y;
+      if (delta < 0 || y <= window.innerHeight * 1.4) {
+        // Any upward scroll re-expands the bar, anywhere on the page.
         setCollapsed(false);
+        return;
       }
+      setCollapsed(true);
+      dismiss();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -103,7 +133,7 @@ export default function Nav({ panels, settings }: Props) {
   }, [openId, dismiss]);
 
   // Touch has no hover, so every handler below is a no-op unless a real
-  // mouse drove the event. Tapping keeps the click-to-toggle behaviour.
+  // mouse drove the event. Tapping is handled in `onSectionClick`.
   const isMouse = (e: React.PointerEvent) => e.pointerType === "mouse";
 
   const hoverSection = (e: React.PointerEvent, id: string) => {
@@ -133,16 +163,23 @@ export default function Nav({ panels, settings }: Props) {
     }, LEAVE_GRACE_MS);
   };
 
-  const togglePin = (id: string) => {
+  // A section in the row is a link to its page. Touch gets one tap of grace:
+  // with no hover to preview the panel, the first tap opens it and the second
+  // follows the link.
+  const onSectionClick = (e: React.MouseEvent, id: string) => {
     clearDwell();
-    if (pinnedId === id) {
-      setPinnedId(null);
-      show(null);
-      return;
+    // `detail === 0` is a keyboard activation, which always navigates.
+    if (e.detail !== 0 && pointerType.current !== "mouse" && openId !== id) {
+      e.preventDefault();
+      setPinnedId(id);
+      show(id);
     }
-    setPinnedId(id);
-    show(id);
   };
+
+  // Hash-only links from the Studio (`#apply`, `#top`) point at homepage
+  // anchors, so anywhere else they need the path put back in front.
+  const siteHref = (href: string) =>
+    href.startsWith("#") && pathname !== "/" ? `/${href}` : href;
 
   const open = panels.find((p) => p.id === openId) ?? null;
   // Hover and pinning both hold the card open against the scroll state.
@@ -154,11 +191,14 @@ export default function Nav({ panels, settings }: Props) {
         ref={navRef}
         onPointerEnter={onNavEnter}
         onPointerLeave={onNavLeave}
+        onPointerDown={(e) => {
+          pointerType.current = e.pointerType;
+        }}
         className="relative w-full max-w-[880px] overflow-hidden rounded-2xl border border-black/[0.04] bg-[#EAEAEA]/75 backdrop-blur-xl"
       >
         <div className="relative flex h-[52px] items-center justify-between px-3">
-          <a
-            href="#top"
+          <Link
+            href={siteHref("#top")}
             className="flex items-center gap-2.5"
             aria-label="HAA home"
           >
@@ -174,7 +214,7 @@ export default function Nav({ panels, settings }: Props) {
               path={settings.markPath}
               className="hidden h-[22px] w-auto text-foreground sm:block"
             />
-          </a>
+          </Link>
           <Image
             src={settings.wordmark}
             alt={settings.title}
@@ -183,12 +223,13 @@ export default function Nav({ panels, settings }: Props) {
             priority
             className="pointer-events-none absolute left-1/2 hidden h-4 w-auto -translate-x-1/2 sm:block"
           />
-          <a
-            href={settings.applyCta.href}
-            className="label rounded-lg border border-[#F2E7E5] bg-[#FFF4F2] px-3.5 py-2 text-brand transition-colors hover:bg-white"
+          <Link
+            href={siteHref(settings.applyCta.href)}
+            className="label label-button inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-white transition-opacity duration-300 ease-out hover:opacity-60"
           >
             {settings.applyCta.label}
-          </a>
+            <ArrowUpRight />
+          </Link>
         </div>
 
         <Rule />
@@ -236,17 +277,18 @@ export default function Nav({ panels, settings }: Props) {
         >
           <div className="flex flex-col overflow-hidden px-3 text-[13px] sm:flex-row">
             {panels.map((section, i) => (
-              <button
+              <Link
                 key={section.id}
-                type="button"
-                onClick={() => togglePin(section.id)}
+                href={panelHref(section.id)}
+                onClick={(e) => onSectionClick(e, section.id)}
+                onNavigate={closeMenu}
                 onPointerEnter={(e) => hoverSection(e, section.id)}
                 onPointerLeave={(e) => {
                   if (isMouse(e)) clearDwell();
                 }}
                 onFocus={() => show(section.id)}
                 aria-expanded={openId === section.id}
-                className={`relative flex-1 py-3.5 transition-colors sm:py-3 ${
+                className={`relative flex-1 py-3.5 text-center transition-colors sm:py-3 ${
                   i > 0
                     ? "before:absolute before:inset-x-2 before:top-0 before:h-px before:bg-rule before:content-[''] sm:before:inset-x-auto sm:before:inset-y-2 sm:before:left-0 sm:before:h-auto sm:before:w-px"
                     : ""
@@ -257,7 +299,7 @@ export default function Nav({ panels, settings }: Props) {
                 }`}
               >
                 {section.label}
-              </button>
+              </Link>
             ))}
             <button
               type="button"
@@ -282,8 +324,17 @@ export default function Nav({ panels, settings }: Props) {
           <div className="overflow-hidden">
             <Rule />
             {panel && (
-              <div
-                className={`grid gap-8 p-7 transition-opacity duration-200 md:grid-cols-[1fr_minmax(0,360px)] ${
+              /* The whole panel is the link, not just "Read more" — nobody
+                 should have to hunt for the target. The label below is a
+                 `span` because an anchor can't nest inside an anchor. */
+              <Link
+                href={panelHref(panel.id)}
+                onNavigate={closeMenu}
+                // The panel stays mounted while collapsed so it can animate
+                // shut; `inert` keeps the zero-height copy out of the tab
+                // order and away from stray clicks.
+                inert={!open}
+                className={`group grid gap-8 p-7 transition-opacity duration-200 md:grid-cols-[1fr_minmax(0,360px)] ${
                   open ? "opacity-100 delay-[250ms]" : "opacity-0"
                 }`}
               >
@@ -296,15 +347,18 @@ export default function Nav({ panels, settings }: Props) {
                       <p key={p.slice(0, 24)}>{p}</p>
                     ))}
                   </div>
-                  <a
-                    href={`#${panel.id}`}
-                    className="label mt-6 inline-flex items-center gap-2 pl-1 text-brand"
-                  >
-                    {panel.readMoreLabel} <span aria-hidden>→</span>
-                  </a>
+                  <span className="label mt-6 inline-flex items-center gap-2 pl-1 text-brand">
+                    {panel.readMoreLabel}{" "}
+                    <span
+                      aria-hidden
+                      className="transition-transform duration-200 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </span>
                 </div>
                 <div className="min-h-[220px] rounded-md bg-[linear-gradient(135deg,#dcd9d4,#c9c5bf)]" />
-              </div>
+              </Link>
             )}
           </div>
         </div>

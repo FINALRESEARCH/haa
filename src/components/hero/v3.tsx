@@ -2,14 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import type { VariantProps } from "@/variants/types";
+import ArrowUpRight from "../ArrowUpRight";
 
 /**
- * Hotlinked on purpose. The master is 29.5 MB and this is standing in until
- * the real hero footage exists, so nothing that heavy earns a place in the
- * repo yet. Swap this for a re-encoded file in `public/` before launch —
- * `scripts/encode-loops.mjs` is the pattern to copy.
+ * Only reached when the hero has no Mux asset on it. Hotlinked on purpose:
+ * the master is 29.5 MB and nothing that heavy earns a place in the repo, and
+ * the real footage is meant to come from the Sizzle field in the Studio —
+ * `scripts/upload-hero-video.mjs` puts a file there from the command line.
  */
-const VIDEO_SRC =
+const PLACEHOLDER_SRC =
   "https://d1lamhf6l6yk6d.cloudfront.net/uploads/2026/03/fundraise-landscape.mp4";
 
 export default function HeroV3({ id, content }: VariantProps<"hero">) {
@@ -47,7 +48,10 @@ export default function HeroV3({ id, content }: VariantProps<"hero">) {
     >
       <video
         ref={videoRef}
-        src={VIDEO_SRC}
+        src={content.video?.src ?? PLACEHOLDER_SRC}
+        // Mux's thumbnail of the first frame, so the hero is a picture from
+        // the moment it paints rather than only once the video decodes.
+        poster={content.video?.poster}
         muted
         loop
         playsInline
@@ -76,9 +80,10 @@ export default function HeroV3({ id, content }: VariantProps<"hero">) {
           </p>
           <a
             href={content.cta.href}
-            className="label rounded-lg border border-white/35 px-8 py-3.5 text-white transition-colors hover:bg-white hover:text-foreground"
+            className="label label-button inline-flex items-center gap-2 rounded-lg bg-brand px-8 py-3.5 text-white transition-opacity duration-300 ease-out hover:opacity-60"
           >
             {content.cta.label}
+            <ArrowUpRight />
           </a>
         </section>
       </div>

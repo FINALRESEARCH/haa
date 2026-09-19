@@ -108,7 +108,7 @@ export default function NetworkV1({ id, content }: VariantProps<"network">) {
           </p>
           <a
             href={content.cta.href}
-            className="label inline-flex items-center gap-2 text-brand"
+            className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-out hover:opacity-60"
           >
             {content.cta.label} <span aria-hidden>→</span>
           </a>

@@ -47,6 +47,8 @@ export const DEFAULT_CONTENT: SiteContent = {
       headline: "An academy for unusually ambitious young people.",
       body: "For students who would rather spend their time making, investigating, experimenting, and pursuing difficult questions.",
       cta: { label: "Apply to HAA", href: "#apply" },
+      // Genuinely blank: the footage only ever comes from Mux.
+      video: null,
       markPath: MARK_PATH,
     },
 

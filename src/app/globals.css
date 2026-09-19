@@ -24,11 +24,28 @@ body {
   font-family: var(--font-nudge), "Helvetica Neue", Arial, sans-serif;
 }
 
+/*
+ * Every mono run on the site. The weight is synthesised — Px Grotesk Mono
+ * ships here as a single Regular face — so drop a Bold into `src/fonts` and
+ * register it in `layout.tsx` if the faux bold ever reads too soft.
+ */
 .label {
   font-family: var(--font-px-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-weight: 700;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/*
+ * The apply buttons. Their padding already gives them their weight, so they
+ * keep the original 11px while the unpadded mono — eyebrows, captions, the
+ * arrow links — sits a step larger. Pair it with `.label`, never alone.
+ * A plain `text-[11px]` would not do: `.label` is unlayered and Tailwind's
+ * utilities are not, so the utility loses the cascade no matter the order.
+ */
+.label-button {
+  font-size: 11px;
 }
 
 @keyframes marquee-left {
@@ -97,12 +114,10 @@ body {
   from {
     opacity: 0;
     filter: blur(8px);
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
     filter: blur(0);
-    transform: translateY(0);
   }
 }
 
@@ -111,16 +126,21 @@ body {
   animation: hero-mark-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* 600ms, overlapping the tail of the mark's fade. */
+/*
+ * 2150ms — the frame the pre-loader finishes clearing. The headline and the
+ * copy below deliberately wait it out rather than playing underneath it, so
+ * the un-blur is something you actually see. Keep these in step with
+ * `preloader-out`'s duration.
+ */
 .hero-headline-in {
-  animation: hero-headline-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) 600ms both;
+  animation: hero-headline-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) 2150ms both;
   will-change: opacity, filter, transform;
 }
 
-/* 1050ms. Body and button ride the same curve together. */
+/* 2600ms. Body and button ride the same curve together. */
 .hero-copy-in {
-  animation: hero-copy-in 800ms cubic-bezier(0.16, 1, 0.3, 1) 1050ms both;
-  will-change: opacity, filter, transform;
+  animation: hero-copy-in 800ms cubic-bezier(0.16, 1, 0.3, 1) 2600ms both;
+  will-change: opacity, filter;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,23 +153,27 @@ body {
 
 /*
  * The pre-loader. One timeline, expressed twice: the text fades in over
- * PRELOAD_IN, the whole card holds for one second, then fades out over
- * PRELOAD_OUT. Percentages below are that timeline resolved against each
+ * PRELOAD_IN, the whole card holds for one second, then blurs and fades out
+ * over PRELOAD_OUT. Percentages below are that timeline resolved against each
  * element's own duration — edit the durations and the stops together.
  *
  *   0ms      text starts fading in     (600ms)
  *   600ms    hold                      (1000ms)
- *   1600ms   card starts fading out    (700ms)
- *   2300ms   card is gone for good
+ *   1600ms   card starts blurring out  (550ms)
+ *   2150ms   card is gone for good, and the hero copy takes over
  */
 @keyframes preloader-out {
   0%,
-  69.57% {
+  74.42% {
     opacity: 1;
+    filter: blur(0px);
     visibility: visible;
+    /* The out segment's curve: still, then decisive. */
+    animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
   }
   100% {
     opacity: 0;
+    filter: blur(24px);
     visibility: hidden;
   }
 }
@@ -165,7 +189,13 @@ body {
 
 .preloader {
   position: fixed;
-  inset: 0;
+  /*
+   * Bled past the viewport on every side. Blurring a full-bleed card samples
+   * transparency beyond its own edges, which would thin the white into a
+   * vignette and let the site show through the frame; the overhang keeps that
+   * soft edge off screen.
+   */
+  inset: -80px;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -173,7 +203,8 @@ body {
   /* Not `--background`: the brief is a white card, whatever the site palette. */
   background: #fff;
   color: #000;
-  animation: preloader-out 2300ms linear both;
+  animation: preloader-out 2150ms linear both;
+  will-change: opacity, filter;
 }
 
 .preloader-text {
@@ -186,10 +217,43 @@ body {
  */
 @media (prefers-reduced-motion: reduce) {
   .preloader {
-    animation: preloader-out 2300ms steps(1, end) both;
+    animation: preloader-out 2150ms steps(1, end) both;
   }
 
   .preloader-text {
     animation: none;
   }
+}
+
+/*
+ * Scrollbar. Chrome/Safari's default bar is ~15px and steals that much page
+ * width on desktop, so it's replaced with a 6px rail: transparent track, a
+ * quiet neutral thumb that darkens on hover. Firefox gets the standard
+ * properties, which are the only ones it honours.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }

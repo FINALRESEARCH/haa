@@ -96,7 +96,7 @@ export default function ClosingV2({ id, content }: VariantProps<"closing">) {
             <a
               key={link.href}
               href={link.href}
-              className="label inline-flex items-center gap-2 text-brand"
+              className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-out hover:opacity-60"
             >
               {link.label} <span aria-hidden>→</span>
             </a>

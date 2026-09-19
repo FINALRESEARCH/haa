@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { VariantProps } from "@/variants/types";
+import ArrowUpRight from "../ArrowUpRight";
 
 /**
  * The mark as its four separate drawings. v1 hands `content.markPath` to a
@@ -230,9 +231,10 @@ export default function HeroV2({ id, content }: VariantProps<"hero">) {
           </p>
           <a
             href={content.cta.href}
-            className="label rounded-lg border border-[#F2E7E5] bg-[#FFF4F2] px-8 py-3.5 text-brand transition-colors hover:bg-brand hover:text-white"
+            className="label label-button inline-flex items-center gap-2 rounded-lg bg-brand px-8 py-3.5 text-white ring-2 ring-background transition-opacity duration-300 ease-out hover:opacity-60"
           >
             {content.cta.label}
+            <ArrowUpRight />
           </a>
         </section>
       </div>

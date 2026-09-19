@@ -28,7 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const shareImage = ogImage ? [{ url: ogImage }] : undefined;
 
   return {
-    title,
+    // Section pages set a bare `title` ("Curriculum"); the template puts the
+    // site name behind it.
+    title: { default: title, template: `%s — ${title}` },
     description,
     icons: {
       icon: [

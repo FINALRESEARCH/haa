@@ -33,12 +33,20 @@ export type Applicant = {
   playbackId: string;
 };
 
+/** A Mux asset resolved to the two URLs a plain `<video>` needs. */
+export type HeroVideo = { src: string; poster: string };
+
 export type HeroContent = {
   /** Matches a `Variant["id"]` in `src/components/hero/index.ts`. */
   layout: string;
   headline: string;
   body: string;
   cta: Cta;
+  /**
+   * The sizzle behind the "video" layout. Null until a Mux asset with a static
+   * rendition is attached, which is the layout's cue to use its placeholder.
+   */
+  video: HeroVideo | null;
   /** Copied from `SiteSettings`: the hero sweeps the mark across the screen. */
   markPath: string;
 };

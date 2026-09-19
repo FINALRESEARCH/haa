@@ -38,6 +38,13 @@ export const heroSection = defineType({
     }),
     defineField({ name: "body", type: "text", rows: 4 }),
     defineField({ name: "cta", type: "cta" }),
+    defineField({
+      name: "video",
+      type: "mux.video",
+      title: "Sizzle",
+      description:
+        'Only the "Video background" layout plays this. It is a muted full-bleed loop, so tick MP4 / static renditions in the upload dialog — the page plays a static rendition rather than an adaptive stream, and an asset without one falls back to the placeholder footage.',
+    }),
   ],
   preview: { select: { title: "headline" }, prepare: ({ title }) => ({ title: "Hero", subtitle: title }) },
 });
