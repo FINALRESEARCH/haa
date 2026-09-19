@@ -62,13 +62,27 @@ const LOOK = {
   dof: 2.4,
 
   /**
-   * How the plate is framed. `zoom` is a multiplier on a cover fit — below 1
-   * overscans, which keeps the cloud bleeding at the extremes of the sway;
-   * `offsetY` slides the framing up (positive) to favour the skyline over the
-   * sky. Both were set against the placeholder plate and want a pass once the
-   * real one is in.
+   * How the plate is framed. `zoom` is a multiplier on a fit that exactly
+   * covers the section: at 1 the plate stops level with the section's edges and
+   * there is nothing to bleed, so values above 1 buy overhang for the dissolve
+   * at the cost of showing less of the city. `offsetY` slides the framing up
+   * (positive) to favour the sky over the skyline. Both were set against the
+   * placeholder plate and want a pass once the real one is in.
    */
-  framing: { zoom: 0.94, offsetY: -0.06 },
+  framing: { zoom: 1.25, offsetY: 0.0 },
+
+  /**
+   * How far past the section's top and bottom the canvas runs, in `vh`. This
+   * only has to be roomy enough for the dissolve to finish inside it; `zoom`
+   * below is what decides how far the field actually reaches.
+   */
+  bleed: 26,
+  /**
+   * Where the dissolve starts, as a fraction of the plate's half-height. Below
+   * this the field is at full strength; at the plate's own edge it is gone, so
+   * the boundary can never be seen however the cloud is framed or turned.
+   */
+  fadeStart: 0.46,
 };
 
 /**
@@ -141,6 +155,7 @@ const luma = (r: number, g: number, b: number) =>
   0.2126 * r + 0.7152 * g + 0.0722 * b;
 
 export default function LifeV3({ id, content }: VariantProps<"life">) {
+  const sectionRef = useRef<HTMLElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pinRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -149,9 +164,10 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    const section = sectionRef.current;
     const host = hostRef.current;
     const canvas = canvasRef.current;
-    if (!host || !canvas) return;
+    if (!section || !host || !canvas) return;
 
     let disposed = false;
     let frame = 0;
@@ -302,6 +318,9 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
           uDrift: { value: 0 },
           uDof: { value: LOOK.dof },
           uFocus: { value: 3 },
+          uFitScale: { value: 1 },
+          uFadeStart: { value: LOOK.fadeStart },
+          uHalfH: { value: cloudH / 2 },
           uWidth: { value: LOOK.strokeWidth },
           uSlash: { value: new THREE.Vector2(SLASH[0], SLASH[1]) },
         },
@@ -319,10 +338,19 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
           uniform float uDrift;
           uniform float uDof;
           uniform float uFocus;
+          uniform float uFitScale;
+          uniform float uFadeStart;
+          uniform float uHalfH;
 
           void main() {
             vColor = color;
             vRotation = aRotation;
+
+            // Dissolve toward the plate's own top and bottom edges. Measured
+            // here rather than in clip space so alpha is already zero wherever
+            // the plate ends — no framing or turn can bring an edge into view.
+            float fy = abs(position.y) / uHalfH;
+            float edge = 1.0 - smoothstep(uFadeStart, 1.0, fy);
 
             vec3 pos = position + aJitter * uDrift;
 
@@ -333,10 +361,10 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
             // thin out, which reads as depth without a second render pass.
             float coc = abs(dist - uFocus) * uDof * 0.1;
             float blur = 1.0 + coc;
-            vAlpha = clamp(0.95 / (blur * blur), 0.08, 0.95);
+            vAlpha = clamp(0.95 / (blur * blur), 0.08, 0.95) * edge;
 
             gl_PointSize = min(
-              aSize * uSize * blur * (300.0 / dist) * uPixelRatio,
+              aSize * uSize * uFitScale * blur * (300.0 / dist) * uPixelRatio,
               26.0
             );
             gl_Position = projectionMatrix * mv;
@@ -389,23 +417,33 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
       const fit = () => {
         const w = host.clientWidth;
         const h = host.clientHeight;
-        if (!w || !h) return;
+        const sectionH = section.clientHeight;
+        if (!w || !h || !sectionH) return;
         camera.aspect = w / h;
         const half = Math.tan((camera.fov * Math.PI) / 360);
-        // Close enough that the plate overfills on both axes, with slack so it
-        // still bleeds at the extremes of the sway rather than pulling in.
-        const dist = Math.min(cloudH / 2 / half, cloudW / 2 / (half * camera.aspect));
+        // Frame against the section, not the canvas: the canvas is deliberately
+        // taller, and fitting to it would crop the city to buy overhang the
+        // dissolve does not actually need. `zoom` then trades view for reach.
+        const dist =
+          Math.min(
+            (cloudH * h) / (2 * half * sectionH),
+            cloudW / (2 * half * camera.aspect),
+          ) / LOOK.framing.zoom;
         const y = LOOK.framing.offsetY * cloudH;
-        camera.position.set(0, y, dist * LOOK.framing.zoom);
+        camera.position.set(0, y, dist);
         camera.lookAt(0, y, 0);
         camera.updateProjectionMatrix();
         material.uniforms.uFocus.value = camera.position.z;
+        // Point size falls off with distance, so without this the strokes would
+        // quietly change weight whenever the bleed or zoom is retuned.
+        material.uniforms.uFitScale.value = camera.position.z / 2.2;
         renderer.setSize(w, h, false);
       };
       fit();
 
       const ro = new ResizeObserver(fit);
       ro.observe(host);
+      ro.observe(section);
       cleanups.push(() => ro.disconnect());
 
       // A cloud this size has no business running while it is off screen.
@@ -503,12 +541,15 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
   }, [content.image.src]);
 
   return (
-    <section
-      id={id}
-      className="relative min-h-screen w-full overflow-hidden"
-      style={{ background: LOOK.field }}
-    >
-      <div ref={hostRef} className="absolute inset-0">
+    <section ref={sectionRef} id={id} className="relative min-h-screen w-full">
+      {/* Runs past the section on both ends so the field dissolves over the
+          neighbouring sections instead of stopping at a boundary. Pointer
+          events stay off here; the pins switch themselves back on. */}
+      <div
+        ref={hostRef}
+        className="pointer-events-none absolute inset-x-0 z-[1]"
+        style={{ top: `-${LOOK.bleed}vh`, bottom: `-${LOOK.bleed}vh` }}
+      >
         {failed ? (
           <Image
             src={content.image.src}
@@ -516,6 +557,9 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
             fill
             sizes="100vw"
             className="object-cover opacity-80"
+            style={{
+              maskImage: `linear-gradient(to bottom, transparent 0%, #000 ${LOOK.bleed}%, #000 ${100 - LOOK.bleed}%, transparent 100%)`,
+            }}
           />
         ) : (
           <>
@@ -570,20 +614,21 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
           ))}
       </div>
 
-      {/* The cloud is busy everywhere, so the type gets its own bed rather than
-          relying on the photograph happening to be dark where the words land. */}
+      {/* The cloud is busy everywhere, so the type gets its own bed. Both bands
+          return to transparent at the section edges: a gradient that went
+          opaque there would draw a hard line across the bleed. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[62vh]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[68vh]"
         style={{
-          background: `linear-gradient(to top, ${LOOK.field} 12%, color-mix(in srgb, ${LOOK.field} 80%, transparent) 42%, transparent 100%)`,
+          background: `linear-gradient(to top, transparent 0%, color-mix(in srgb, ${LOOK.field} 66%, transparent) 20%, color-mix(in srgb, ${LOOK.field} 66%, transparent) 58%, transparent 100%)`,
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[40vh]"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[46vh]"
         style={{
-          background: `linear-gradient(to bottom, color-mix(in srgb, ${LOOK.field} 90%, transparent) 8%, transparent 100%)`,
+          background: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${LOOK.field} 58%, transparent) 26%, color-mix(in srgb, ${LOOK.field} 58%, transparent) 66%, transparent 100%)`,
         }}
       />
 

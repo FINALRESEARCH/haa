@@ -169,9 +169,13 @@ export default function HeroV2({ id, content }: VariantProps<"hero">) {
   }, []);
 
   return (
+    // The network section that follows pulls itself up by 25vh so it slides
+    // over the tail of the hero. v1 is 220vh tall and has the slack to spare;
+    // this one is exactly a screen, so it has to hand that 25vh back or the
+    // overlap eats the copy and crops the mark at 75vh.
     <div
       id={id}
-      className="relative h-screen overflow-hidden bg-background"
+      className="relative mb-[25vh] h-screen overflow-hidden bg-background"
     >
       <div
         ref={fieldRef}

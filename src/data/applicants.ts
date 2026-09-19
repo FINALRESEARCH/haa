@@ -20,6 +20,7 @@ export const applicants: Applicant[] = [
   tile("diwen-huang", "Diwen Huang", ""),
   tile("elle-liemandt", "Elle Liemandt", ""),
   tile("idhant-ranjan", "Idhant Ranjan", ""),
-  // TODO: name this one — the master is still an unedited camera-roll file.
-  tile("applicant-04", "", ""),
+  // TODO: placeholder name — the client has not supplied this one's real
+  // name, and the master is still an unedited camera-roll file.
+  tile("ren-takahashi", "Ren Takahashi", ""),
 ];

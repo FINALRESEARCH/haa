@@ -12,15 +12,12 @@ const MIN_PER_SET = 6;
  * they land the four we have cycle, which is what the row does anyway once it
  * wraps — the repeat just starts sooner.
  */
-function fill(applicants: Applicant[], offset: number): Applicant[] {
+function fill(applicants: Applicant[]): Applicant[] {
   if (!applicants.length) return [];
-  const rotated = [
-    ...applicants.slice(offset % applicants.length),
-    ...applicants.slice(0, offset % applicants.length),
-  ];
-  const out: Applicant[] = [];
-  while (out.length < MIN_PER_SET) out.push(...rotated);
-  return out.slice(0, Math.max(MIN_PER_SET, rotated.length));
+  // Whole cycles only. Truncating mid-cycle would show the first faces more
+  // often than the last, which is exactly how a short loop gives itself away.
+  const cycles = Math.ceil(MIN_PER_SET / applicants.length);
+  return Array.from({ length: cycles }, () => applicants).flat();
 }
 
 function Tile({ applicant }: { applicant: Applicant }) {
@@ -76,22 +73,20 @@ function Tile({ applicant }: { applicant: Applicant }) {
 function Row({
   applicants,
   direction,
-  offset,
   shown,
 }: {
   applicants: Applicant[];
   /** Which way the tiles travel, not which way the track translates. */
   direction: "left" | "right";
-  offset: number;
   shown: boolean;
 }) {
-  const set = fill(applicants, offset);
+  const set = fill(applicants);
   // Rendered twice so the -50% wrap lands on an identical frame.
   const tiles = [...set, ...set];
 
   return (
     <div
-      className={`overflow-hidden transition-[opacity,transform] duration-[900ms] ease-out ${
+      className={`w-full overflow-hidden transition-[opacity,transform] duration-[900ms] ease-out ${
         shown
           ? "translate-x-0 opacity-100"
           : direction === "right"
@@ -100,10 +95,10 @@ function Row({
       }`}
     >
       <div
-        className={`flex w-max gap-3 ${
+        className={`flex w-max gap-4 ${
           direction === "right" ? "marquee-right" : "marquee-left"
         }`}
-        style={{ height: "clamp(150px, 26vh, 300px)" }}
+        style={{ height: "clamp(260px, 46vh, 520px)" }}
       >
         {tiles.map((applicant, i) => (
           <Tile key={`${applicant.loop}-${i}`} applicant={applicant} />
@@ -114,10 +109,9 @@ function Row({
 }
 
 /**
- * The applicants as two rows drifting past each other, the copy held between
- * them. Adapted from the partners marquee: same pinned screen and same
- * opposed drift, with video tiles in place of logos and the rows rotated
- * against each other so the same face never sits directly above itself.
+ * The applicants as a single row drifting under the copy. Adapted from the
+ * partners marquee — same pinned screen, same drift — but one row rather than
+ * two, so each tile is large enough to read a face in rather than a thumbnail.
  */
 export default function PeopleMarqueeV3({ id, content }: VariantProps<"people">) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -138,15 +132,8 @@ export default function PeopleMarqueeV3({ id, content }: VariantProps<"people">)
     <div id={id} className="h-[200vh]">
       <section
         ref={sectionRef}
-        className="sticky top-0 flex h-screen flex-col justify-center gap-[5vh] overflow-hidden bg-background"
+        className="sticky top-0 flex h-screen flex-col items-center justify-center gap-[7vh] overflow-hidden bg-background"
       >
-        <Row
-          applicants={content.applicants}
-          direction="right"
-          offset={0}
-          shown={shown}
-        />
-
         <div
           className={`px-6 text-center transition-opacity duration-700 ease-out ${
             shown ? "opacity-100 delay-200" : "opacity-0"
@@ -162,12 +149,7 @@ export default function PeopleMarqueeV3({ id, content }: VariantProps<"people">)
           </div>
         </div>
 
-        <Row
-          applicants={content.applicants}
-          direction="left"
-          offset={2}
-          shown={shown}
-        />
+        <Row applicants={content.applicants} direction="right" shown={shown} />
       </section>
     </div>
   );

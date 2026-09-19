@@ -1,6 +1,7 @@
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import DraftModeBanner from "@/components/DraftModeBanner";
+import Preloader from "@/components/Preloader";
 import { getSiteContent } from "@/sanity/content";
 import { SanityLive } from "@/sanity/live";
 
@@ -27,6 +28,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `:root{${palette}}` }} />
+      <Preloader />
       <div className="flex min-h-full flex-col">{children}</div>
       <SanityLive />
       {isDraft && (

@@ -19,11 +19,12 @@ export const heroSection = defineType({
       name: "layout",
       type: "string",
       description:
-        "Which of the two hero layouts the page ships with. The ?hero= switcher still overrides this locally.",
+        "Which of the three hero layouts the page ships with. The ?hero= switcher still overrides this locally.",
       options: {
         list: [
           { title: "Original (mark sweeps left on scroll)", value: "original" },
           { title: "Marquee mark (mark loops rightward on its own)", value: "marquee" },
+          { title: "Video background (full-bleed footage, white copy)", value: "video" },
         ],
         layout: "radio",
       },
@@ -219,7 +220,7 @@ export const lifeSection = defineType({
       options: {
         list: [
           { title: "Lock-up (plate rises, heading inverts)", value: "lockup" },
-          { title: "Full-bleed plate", value: "bleed" },
+          { title: "Traced city (line work fills with colour)", value: "bleed" },
           { title: "Splat field (the plate as a particle cloud)", value: "splat" },
         ],
         layout: "radio",

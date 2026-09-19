@@ -130,3 +130,66 @@ body {
     animation: none;
   }
 }
+
+/*
+ * The pre-loader. One timeline, expressed twice: the text fades in over
+ * PRELOAD_IN, the whole card holds for one second, then fades out over
+ * PRELOAD_OUT. Percentages below are that timeline resolved against each
+ * element's own duration — edit the durations and the stops together.
+ *
+ *   0ms      text starts fading in     (600ms)
+ *   600ms    hold                      (1000ms)
+ *   1600ms   card starts fading out    (700ms)
+ *   2300ms   card is gone for good
+ */
+@keyframes preloader-out {
+  0%,
+  69.57% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes preloader-text-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Not `--background`: the brief is a white card, whatever the site palette. */
+  background: #fff;
+  color: #000;
+  animation: preloader-out 2300ms linear both;
+}
+
+.preloader-text {
+  animation: preloader-text-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/*
+ * Reduced motion keeps the pause — it is what buys the hero its loading time —
+ * and drops only the fades.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .preloader {
+    animation: preloader-out 2300ms steps(1, end) both;
+  }
+
+  .preloader-text {
+    animation: none;
+  }
+}
