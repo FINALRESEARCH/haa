@@ -1,18 +1,49 @@
-import type { Portrait } from "@/content/types";
+import type { MuxVideo, Portrait } from "@/content/types";
 
 const portrait = (n: number) =>
   `/portraits/portrait-${String(n).padStart(2, "0")}.jpg`;
 
+/**
+ * Stand-in hover footage. The real clips are the client's to source — each
+ * speaker actually speaking somewhere — and land as Mux assets on the `person`
+ * document, at which point Sanity supplies `video` and none of this is used.
+ *
+ * Until then the applicant loops already in `public/` stand in, cycled rather
+ * than repeated so the grid does not read as one clip playing ten times.
+ */
+const PLACEHOLDER_SLUGS = [
+  "diwen-huang",
+  "elle-liemandt",
+  "idhant-ranjan",
+  "ren-takahashi",
+];
+
+export const placeholderVideo = (i: number): MuxVideo => {
+  const slug = PLACEHOLDER_SLUGS[i % PLACEHOLDER_SLUGS.length];
+  return {
+    src: `/applicants/${slug}-loop.mp4`,
+    poster: `/applicants/${slug}-poster.jpg`,
+  };
+};
+
+const speaker = (n: number, name: string, affiliation: string): Portrait => ({
+  src: portrait(n),
+  name,
+  affiliation,
+  video: placeholderVideo(n),
+});
+
 export const people: Portrait[] = [
-  { src: portrait(1), name: "Sam Altman", affiliation: "OpenAI" },
-  { src: portrait(2), name: "Jensen Huang", affiliation: "NVIDIA" },
-  { src: portrait(3), name: "Marc Andreessen", affiliation: "a16z" },
-  { src: portrait(4), name: "Fei-Fei Li", affiliation: "Stanford" },
-  { src: portrait(5), name: "Yuval Noah Harari", affiliation: "Author" },
-  // TODO: confirm the two unidentified portraits before these chips ship.
-  { src: portrait(6), name: "", affiliation: "" },
-  { src: portrait(7), name: "Mark Zuckerberg", affiliation: "Meta" },
-  { src: portrait(8), name: "Alex Karp", affiliation: "Palantir" },
-  { src: portrait(9), name: "", affiliation: "" },
-  { src: portrait(10), name: "Larry Page", affiliation: "Google" },
+  speaker(1, "Sam Altman", "OpenAI"),
+  speaker(2, "Jensen Huang", "NVIDIA"),
+  speaker(3, "Marc Andreessen", "a16z"),
+  speaker(4, "Fei-Fei Li", "Stanford"),
+  speaker(5, "Yuval Noah Harari", "Author"),
+  // TODO: the client has not identified these two portraits. They hold their
+  // place in the grid and simply go uncaptioned until the names land.
+  speaker(6, "", ""),
+  speaker(7, "Mark Zuckerberg", "Meta"),
+  speaker(8, "Alex Karp", "Palantir"),
+  speaker(9, "", ""),
+  speaker(10, "Larry Page", "Google"),
 ];

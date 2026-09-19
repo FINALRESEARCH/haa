@@ -120,8 +120,12 @@ let asset;
 for (let i = 0; i < 160; i++) {
   asset = await mux(`/assets/${assetId}`);
   if (asset.status === "errored") throw new Error(JSON.stringify(asset.errors));
-  const renditions = asset.static_renditions?.status;
-  if (asset.status === "ready" && (renditions === "ready" || renditions === "errored")) break;
+  // The files landing is the signal, not the status beside them: the assets
+  // endpoint does not always carry a `static_renditions.status`, and waiting
+  // for one that never comes would spin until the loop gave up.
+  const renditions = asset.static_renditions;
+  const done = renditions?.files?.length > 0 || renditions?.status === "errored";
+  if (asset.status === "ready" && done) break;
   await wait(5000);
 }
 if (asset.status !== "ready") throw new Error(`Asset still ${asset.status}`);

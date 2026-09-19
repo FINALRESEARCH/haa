@@ -225,7 +225,7 @@ export default function Nav({ panels, settings }: Props) {
           />
           <Link
             href={siteHref(settings.applyCta.href)}
-            className="label label-button inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-white transition-opacity duration-300 ease-out hover:opacity-60"
+            className="label label-button inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-white transition-opacity duration-300 ease-in-out hover:opacity-60"
           >
             {settings.applyCta.label}
             <ArrowUpRight />

@@ -7,9 +7,16 @@ export type Cta = { label: string; href: string };
 
 export type Portrait = {
   src: string;
-  /** Shown in the hover chip; leave empty to suppress the chip. */
+  /**
+   * Printed under the tile, always — parents of applicants will not recognise
+   * these faces. An entry without one still takes its place in the grid; it
+   * simply goes uncaptioned until the client identifies it.
+   */
   name: string;
+  /** The second line: "OpenAI", not a sentence. */
   affiliation: string;
+  /** Fades up over the still on hover. Null until a master is on Mux. */
+  video: MuxVideo | null;
 };
 
 export type PartnerLogo = {
@@ -34,7 +41,7 @@ export type Applicant = {
 };
 
 /** A Mux asset resolved to the two URLs a plain `<video>` needs. */
-export type HeroVideo = { src: string; poster: string };
+export type MuxVideo = { src: string; poster: string };
 
 export type HeroContent = {
   /** Matches a `Variant["id"]` in `src/components/hero/index.ts`. */
@@ -46,12 +53,14 @@ export type HeroContent = {
    * The sizzle behind the "video" layout. Null until a Mux asset with a static
    * rendition is attached, which is the layout's cue to use its placeholder.
    */
-  video: HeroVideo | null;
+  video: MuxVideo | null;
   /** Copied from `SiteSettings`: the hero sweeps the mark across the screen. */
   markPath: string;
 };
 
 export type NetworkContent = {
+  /** Matches a `Variant["id"]` in `src/components/network/index.ts`. */
+  layout: string;
   heading: string;
   body: string;
   cta: Cta;

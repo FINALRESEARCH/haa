@@ -53,6 +53,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     },
 
     network: {
+      layout: "tiles",
       heading: "Learn from people shaping the world.",
       body: "A community of founders, scientists, engineers, investors, designers, and operators teach at HAA, speak with students, offer mentorship, and open doors to Silicon Valley and the world.",
       cta: { label: "Explore the network", href: "#network" },

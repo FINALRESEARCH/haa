@@ -77,7 +77,8 @@ const PEOPLE = [
   { slug: "marc-andreessen", name: "Marc Andreessen", affiliation: "a16z", file: "portrait-03.jpg" },
   { slug: "fei-fei-li", name: "Fei-Fei Li", affiliation: "Stanford", file: "portrait-04.jpg" },
   { slug: "yuval-noah-harari", name: "Yuval Noah Harari", affiliation: "Author", file: "portrait-05.jpg" },
-  // TODO: confirm the two unidentified portraits before these chips ship.
+  // TODO: the client has not identified these two portraits. They hold their
+  // place in the grid and simply go uncaptioned until the names land.
   { slug: "portrait-06", name: "", affiliation: "", file: "portrait-06.jpg" },
   { slug: "mark-zuckerberg", name: "Mark Zuckerberg", affiliation: "Meta", file: "portrait-07.jpg" },
   { slug: "alex-karp", name: "Alex Karp", affiliation: "Palantir", file: "portrait-08.jpg" },

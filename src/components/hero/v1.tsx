@@ -126,7 +126,7 @@ export default function HeroV1({ id, content }: VariantProps<"hero">) {
             </p>
             <a
               href={content.cta.href}
-              className="label label-button inline-flex items-center gap-2 rounded-lg bg-brand px-8 py-3.5 text-white ring-2 ring-background transition-opacity duration-300 ease-out hover:opacity-60"
+              className="label label-button inline-flex items-center gap-2 rounded-lg bg-brand px-8 py-3.5 text-white ring-2 ring-background transition-opacity duration-300 ease-in-out hover:opacity-60"
             >
               {content.cta.label}
               <ArrowUpRight />

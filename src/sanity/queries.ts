@@ -1,6 +1,12 @@
 import { defineQuery } from "next-sanity";
 
-const PERSON = `{ name, affiliation, portrait }`;
+/** The hover clip is a static rendition, same as the hero's — see `muxVideo`. */
+const PERSON = `{
+  name,
+  affiliation,
+  portrait,
+  video{ asset->{ playbackId, "renditions": data.static_renditions.files[].name } }
+}`;
 
 /**
  * The whole site in one round trip. The page is a single route, so splitting
@@ -34,7 +40,7 @@ export const SITE_CONTENT_QUERY = defineQuery(`{
       playbackId,
       "renditions": data.static_renditions.files[].name
     } } },
-    network{ heading, body, cta, portraits[]->${PERSON} },
+    network{ layout, heading, body, cta, portraits[]->${PERSON} },
     program{ heading, subheading, paragraphs, cta },
     admissions{ image, heading, paragraphs, cta },
     peopleWall{ layout, heading, paragraphs, tiles[]->${PERSON} },

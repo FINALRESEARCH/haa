@@ -81,7 +81,7 @@ export default function ClosingV1({ id, content }: VariantProps<"closing">) {
             <a
               key={link.href}
               href={link.href}
-              className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-out hover:opacity-60"
+              className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-in-out hover:opacity-60"
             >
               {link.label} <span aria-hidden>→</span>
             </a>
@@ -109,7 +109,7 @@ export function ApplyButton({
     <a
       href={cta.href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className={`label label-button inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-4 text-white transition-opacity duration-300 ease-out hover:opacity-60 ${className}`}
+      className={`label label-button inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-4 text-white transition-opacity duration-300 ease-in-out hover:opacity-60 ${className}`}
     >
       {cta.label}
       <ArrowUpRight />

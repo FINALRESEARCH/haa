@@ -72,7 +72,7 @@ export default function ProgramV1({ id, content }: VariantProps<"program">) {
       <div data-reveal className="opacity-0 will-change-[opacity]">
         <a
           href={content.cta.href}
-          className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-out hover:opacity-60"
+          className="label inline-flex items-center gap-2 text-brand transition-opacity duration-300 ease-in-out hover:opacity-60"
         >
           {content.cta.label} <span aria-hidden>→</span>
         </a>

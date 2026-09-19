@@ -55,6 +55,20 @@ export const networkSection = defineType({
   type: "object",
   fields: [
     defineField({
+      name: "layout",
+      type: "string",
+      description:
+        "Which of the two speaker layouts the page ships with. The ?network= switcher still overrides this locally.",
+      options: {
+        list: [
+          { title: "Tiles (one wide tile per speaker, names underneath)", value: "tiles" },
+          { title: "Original (five-across grid, names on hover)", value: "original" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "tiles",
+    }),
+    defineField({
       name: "heading",
       type: "text",
       rows: 2,

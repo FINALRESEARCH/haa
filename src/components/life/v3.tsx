@@ -645,7 +645,7 @@ export default function LifeV3({ id, content }: VariantProps<"life">) {
           </div>
           <a
             href={content.cta.href}
-            className="label inline-flex items-center gap-2 text-foreground transition-opacity duration-300 ease-out hover:opacity-60"
+            className="label inline-flex items-center gap-2 text-foreground transition-opacity duration-300 ease-in-out hover:opacity-60"
           >
             {content.cta.label} <span aria-hidden>→</span>
           </a>

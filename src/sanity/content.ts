@@ -1,9 +1,10 @@
 import { stegaClean } from "next-sanity";
 import { cache } from "react";
 import { DEFAULT_CONTENT } from "@/content/defaults";
+import { placeholderVideo } from "@/data/people";
 import type {
   Cta,
-  HeroVideo,
+  MuxVideo,
   NavPanel,
   PartnerLogo,
   Picture,
@@ -15,7 +16,8 @@ import { sanityFetch } from "./live";
 import { SITE_CONTENT_QUERY } from "./queries";
 
 /** Roughly 2× the largest CSS box each image is ever drawn into. */
-const PORTRAIT_WIDTH = 800;
+// A speaker tile is close to full-bleed now, not a fifth of a 1150px grid.
+const PORTRAIT_WIDTH = 2000;
 const PLATE_WIDTH = 2100;
 const LOGO_WIDTH = 400;
 // Crawlers read this at face value; no need to serve it at retina width.
@@ -98,15 +100,17 @@ function picture(value: unknown, fallback: Picture): Picture {
 }
 
 /**
- * A Mux asset turned into the two plain URLs the hero's `<video>` wants: a
- * static rendition rather than an adaptive stream, which is what lets the
- * background loop stay a bare video tag, and a thumbnail as its poster.
+ * A Mux asset turned into the two plain URLs a bare `<video>` wants: a static
+ * rendition rather than an adaptive stream, which is what lets the hero's
+ * background loop and the speaker tiles' hover clips stay plain video tags,
+ * and a thumbnail as its poster.
  *
  * Nothing is returned unless the asset actually has a rendition — MP4 support
  * is per-asset on Mux, and a stream URL for a rendition that was never
- * encoded 404s, which reads on the page as a hero that is simply black.
+ * encoded 404s, which reads on the page as a hero that is simply black, or a
+ * speaker tile whose hover does nothing at all.
  */
-function heroVideo(value: unknown): HeroVideo | null {
+function muxVideo(value: unknown): MuxVideo | null {
   const asset = obj(obj(value)?.asset);
   const playbackId = raw(asset?.playbackId, "", MUX_ID);
   if (!playbackId) return null;
@@ -127,17 +131,32 @@ function heroVideo(value: unknown): HeroVideo | null {
   };
 }
 
-function portraits(value: unknown, fallback: Portrait[]): Portrait[] {
+/**
+ * `stand in for missing hover clips` is a stopgap for the network grid only:
+ * the speakers' own footage is the client's to source, and until a master is
+ * attached to their `person` document the tile borrows an applicant loop so
+ * the hover reads as designed. Drop the argument once the clips land.
+ *
+ * The people wall passes it nothing — those tiles are stills by design.
+ */
+function portraits(
+  value: unknown,
+  fallback: Portrait[],
+  standInForMissingVideo = false,
+): Portrait[] {
   if (!Array.isArray(value)) return fallback;
   const kept: Portrait[] = [];
   for (const entry of value) {
     const raw = obj(entry);
     const src = imageUrl(raw?.portrait as never, PORTRAIT_WIDTH);
     if (!src) continue;
+    const video = muxVideo(raw?.video);
     kept.push({
       src,
       name: str(raw?.name, ""),
       affiliation: str(raw?.affiliation, ""),
+      video:
+        video ?? (standInForMissingVideo ? placeholderVideo(kept.length) : null),
     });
   }
   return kept.length ? kept : fallback;
@@ -228,17 +247,19 @@ export function mergeContent(data: unknown): SiteContent {
         headline: str(hero?.headline, fallback.sections.hero.headline),
         body: str(hero?.body, fallback.sections.hero.body),
         cta: cta(hero?.cta, fallback.sections.hero.cta),
-        video: heroVideo(hero?.video),
+        video: muxVideo(hero?.video),
         // The sweeping mark is the same drawing as the one in the nav.
         markPath: raw(settings?.markPath, fallback.sections.hero.markPath, SVG_PATH),
       },
       network: {
+        layout: str(network?.layout, fallback.sections.network.layout),
         heading: str(network?.heading, fallback.sections.network.heading),
         body: str(network?.body, fallback.sections.network.body),
         cta: cta(network?.cta, fallback.sections.network.cta),
         portraits: portraits(
           network?.portraits,
           fallback.sections.network.portraits,
+          true,
         ),
       },
       program: {
